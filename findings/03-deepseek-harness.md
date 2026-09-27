@@ -304,7 +304,7 @@ DeepSeek Harness 是一个 all-plugin Cordis agent harness（`README`+`packages/
 
 ## 6 与其他来源的重叠/冲突预判
 
-以本工作区同侪产出 `findings/01-ponytail.md`（已实读）为主要对照；`02-karpathy-plugin.md` 与 `04-storage-online.md` 我只读了标题层级（见 §8 不确定项 U7）。
+以本工作区同侪产出 `findings/01-ponytail.md`（已实读）为主要对照；`02-karpathy-plugin.md` 与 `04-experience.md` 我只读了标题层级（见 §8 不确定项 U7）。
 
 **强互补（可直接叠加，无冲突）**
 
@@ -357,7 +357,7 @@ DeepSeek Harness 是一个 all-plugin Cordis agent harness（`README`+`packages/
 - **U4（根 AGENTS.md 的 headroom 与自身规则）**：根 `AGENTS.md` 实测 **1949 词 / 上限 1950**（约 0.05% headroom），而 `docs/AGENTS.md:58` 要求"A 或以下目标时保留至少 5% headroom"。按字面，这条元规则当前处于不满足状态。可能解释：ratchet 规则是"降到目标以下时不得再涨"，而非"必须始终留 5%"——文本可两读，未判定。
 - **U5（`verify-package-invariants` 的判定细节）**：我读了该脚本头注释（`scripts/verify-package-invariants.ts:1`）与 `packages/AGENTS.md:19`、`AGENTS.md:132` 的表述，但**未逐行读** `scripts/package-invariants.ts` 的完整判定集合。因此"空 companion / 被忽略 reporter 会失败"是**引自文档**而非脚本实读，细节判定条件未验证。
 - **U6（"guard" 的强度语义）**：`packages/guard/` 的两个插件都自称 advisory/协作式——`repeat-tool-reminder` 明确 "without vetoing or rewriting calls"，`timeout-policy` 依赖工具"承诺遵守 `exec.signal`"。因此把 `guard/` 读作"阻止代理越界"的强制层是不准确的；它更像"把卡住的 loop 拉回正轨的软约束"。产品侧的**硬**约束在 sandbox 与 approval 路径（§4 第 4 条）。
-- **U7（同侪产出的对照深度）**：§6 对 ponytail 的具体条款断言基于 `findings/01-ponytail.md` 的正文（已实读其中 R01–R05 及结构）。对 `02-karpathy-plugin.md`、`04-storage-online.md` 我**只读了标题层级**，未读正文，故 §6 未对这两份做实质对比（避免与同侪重复劳动）。关于 karpathy-plugin 的所有可能重叠均属未验证。
+- **U7（同侪产出的对照深度）**：§6 对 ponytail 的具体条款断言基于 `findings/01-ponytail.md` 的正文（已实读其中 R01–R05 及结构）。对 `02-karpathy-plugin.md`、`04-experience.md` 我**只读了标题层级**，未读正文，故 §6 未对这两份做实质对比（避免与同侪重复劳动）。关于 karpathy-plugin 的所有可能重叠均属未验证。
 - **U8（未覆盖的规则载体）**：`python/` 的规则（仅 `python/README.md` 被间接引用）、`.github/review-ownership/` 的加权审批策略全文、`apps/desktop/README.md#windows-ev-signing` 的必需阅读章节、`.oxlintrc.json`（12 KB，未展开逐条 lint 规则）、`patches/` 与 `pnpm-workspace.yaml` 的策略面均未纳入 A 层。A 层因此是"高价值主干"，不是"穷尽清单"（主干已达 74 条 ID，远超 ≥15 的要求）。
 - **U9（"仅大型 monorepo 适用"的判断属分析者判断）**：§7 的该标注基于"是否需要额外基础设施/CI 矩阵/多人协作规模"的推理，非仓库自述；仓库自身并未区分"通用 vs monorepo 专用"。
 - **U10（行号随版本漂移）**：所有 `path:line` 绑定到 sha `477b4f4`。该仓库正处于 0.1.7-rc 发布期（最近提交是 release 合并），`AGENTS.md` 与 `docs/` 都在词数上限附近，后续轻微改动即可使行号整体位移；复用本报告时建议同时核对 sha。

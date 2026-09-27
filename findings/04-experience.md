@@ -1,10 +1,12 @@
-# 04 · storage-online AGENTS.md 规则约束提取（task-4）
+# 04 · 个人经验溯源：早期自建前端项目的 AGENTS.md 规则提取（task-4）
+
+> 该项目已去标识：下文统一称"该项目"，不出现项目名与仓库路径。规则已泛化进 `rules/`，本文件仅作溯源记录。
 
 ## 0 溯源
 
 | 项 | 值 |
 | --- | --- |
-| 源文件 | `/home/leihaohao/neucloud-workspace/energy/standalone/storage-online/AGENTS.md` |
+| 源文件 | 作者早期自建前端项目的 `AGENTS.md`（78 行；项目已去标识） |
 | 规模 | 78 行 / 5162 B（只读核验：`read` + `wc -l`；未做任何写入） |
 | 结构 | L1–27 = Vite+ 注入区块（`<!--VITE PLUS START-->` … `<!--VITE PLUS END-->`）；L28 空行；L29–78 = 人工撰写的项目约定 |
 | 源项目写操作 | 无。全程只读命令（`read`/`cat`/`ls`/`find`/`grep`/`git status\|diff\|ls-files\|check-ignore`/`md5sum`/`diff`）；**未执行任何 `vp` 命令**（含 `vp check`/`vp build`，避免写盘） |
@@ -14,7 +16,7 @@
 | 证据 | 路径 | 说明 |
 | --- | --- | --- |
 | 标记常量定义 | `/home/leihaohao/workspace/vite-plus/packages/cli/src/utils/agent.ts:77-78` | `AGENT_INSTRUCTIONS_START_MARKER = '<!--VITE PLUS START-->'`、`AGENT_INSTRUCTIONS_END_MARKER = '<!--VITE PLUS END-->'` |
-| 模板文件 | `/home/leihaohao/neucloud-workspace/energy/standalone/storage-online/node_modules/vite-plus/AGENTS.md`（vite-plus `0.3.3`，软链 → `.pnpm/vite-plus@0.3.3_jiti@2.7.0_typescript@6.0.3/node_modules/vite-plus`） | 与项目 AGENTS.md L1–27 **md5 完全相同**：`ee8ea10ff2d9fbad9e3a5254c44d3882`（`diff` 无输出 → 逐字节一致） |
+| 模板文件 | 项目 `node_modules/vite-plus/AGENTS.md`（vite-plus `0.3.3`，软链 → `.pnpm/vite-plus@0.3.3_…/node_modules/vite-plus`） | 与项目 AGENTS.md L1–27 **md5 完全相同**：`ee8ea10ff2d9fbad9e3a5254c44d3882`（`diff` 无输出 → 逐字节一致） |
 | 模板读取代码 | `agent.ts:237` | `const templatePath = path.join(pkgRoot, 'AGENTS.md')` —— 注入内容取自 vite-plus 包自带的 `AGENTS.md` |
 | 更新逻辑 | `agent.ts:225-250`（`updateExistingAgentInstructions`）、`:247-250` | 注释明示 "Silently update agent instruction files that contain Vite+ markers … No Vite+ markers → no writes"；仅在有标记时用 `replaceMarkedAgentInstructionsSection()` 覆写标记区间 |
 | 设计依据 | `/home/leihaohao/workspace/vite-plus/rfcs/config-and-staged-commands.md:106` | "Agent instructions: silently updates existing files that contain Vite+ markers when content is outdated. Never creates new agent files." |
@@ -26,7 +28,7 @@
 
 ## 1 一句话定位
 
-storage-online 是「React 19 + antd 6 + Ant Design Pro Components 3 + TanStack Router/Store + Vite+ 工具链」的单体中后台前端项目；其 AGENTS.md = **工具自动注入的 Vite+ 操作手册（L1–27，随包升级会被覆写）** + **人工撰写的 5 组项目约定（L29–78：技术栈 / 依赖与配置 / 代码分层 / 编码约定 / 验证）**，共 28 条可执行约束，核心取向是「**反防御式编码 + 最小化声明 + 把正确性交给类型系统与工具链**」。
+该项目是「React 19 + antd 6 + Ant Design Pro Components 3 + TanStack Router/Store + Vite+ 工具链」的单体中后台前端项目；其 AGENTS.md = **工具自动注入的 Vite+ 操作手册（L1–27，随包升级会被覆写）** + **人工撰写的 5 组项目约定（L29–78：技术栈 / 依赖与配置 / 代码分层 / 编码约定 / 验证）**，共 28 条可执行约束，核心取向是「**反防御式编码 + 最小化声明 + 把正确性交给类型系统与工具链**」。
 
 ## 2 规则清单
 
@@ -134,7 +136,7 @@ storage-online 是「React 19 + antd 6 + Ant Design Pro Components 3 + TanStack 
 - **P11 的措辞张力**：AGENTS.md 说「不要手写 `createFileRoute` 的路径字符串」，实测 6 个路由文件都含有字面量路径字符串（与文件路径严格一致）。合理推断其本意为「路径由文件位置决定、不得臆造，且不得手工维护 `routeTree.gen.ts`」，但未找到更明确的说明（项目 `docs/` 仅有 `portal-embed-bridge.md`）。**建议融合时改写为可验证表述**：「路由路径由文件位置决定，路径字符串须与文件路径严格一致；`routeTree.gen.ts` 不得手改」。
 - **P12「需要提交」的判定**：`git status` 显示整个重构（`src/routes/`、`src/stores/`、`src/layouts/` 等）均未提交，属工作树中间态，因此无法据当前 git 状态确认该规则被遵守或违反。
 - **未做的事**：未做网络检索；未核验 antd 6 / Pro Components 3 / TanStack 各包的版本兼容矩阵（超出规则提取范围）；未审计 `docs/portal-embed-bridge.md` 与 `src/modules/*` 的业务语义。
-- **方法**：全部结论来自只读命令（`read`、`cat`、`ls`、`find`、`grep`、`git status|diff|ls-files|check-ignore`、`md5sum`、`diff`）。本次仅写入 `/home/leihaohao/workspace/agent-rules/findings/04-storage-online.md` 一个文件，源项目零改动。
+- **方法**：全部结论来自只读命令（`read`、`cat`、`ls`、`find`、`grep`、`git status|diff|ls-files|check-ignore`、`md5sum`、`diff`）。本次仅写入 `findings/04-experience.md` 一个文件，源项目零改动。
 
 **更正记录（Lead 复核，依据 `findings/99-verification.md`）**
 - 项目 `package.json` 的 `"prepare": "vp config"` 实际位于 **第 10 行**（原写作 `:9`）；已在 §0 证据表与 §3 两处更正。

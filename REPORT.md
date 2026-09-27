@@ -1,10 +1,10 @@
 # 四源 AI 编码代理规则集：融合分析报告
 
-> 分析对象：**P** Ponytail、**K** Karpathy 插件（karpathy-ponytail-skills）、**H** DeepSeek Harness、**S** 早期个人项目探索（storage-online 当时的 `AGENTS.md`）
+> 分析对象：**P** Ponytail、**K** Karpathy 插件（karpathy-ponytail-skills）、**H** DeepSeek Harness、**S** 个人经验（作者早期自建项目的 `AGENTS.md`，已去标识）
 > 方法：4 个分析 teammate 分别产出 `findings/01–04`，Lead 融合为 `AGENTS.merged.md`，再由独立 verifier 对抗性核验（见 §10）。
 > 本报告所有条款均可回溯到 `findings/*` 中的 `path:line`；未引入四源之外的新规则。
 >
-> **结构变更（收尾）**：规则已按场景拆分到 [`rules/`](rules/)（`base.md` 通用、`frontend.md`、`monorepo.md`），规则文本去除了来源标签并泛化为与框架/依赖无关的表述。因此 `AGENTS.merged.md`、`examples/`、`tailor/`、`tools/` 已删除；本报告与 `findings/` 保留为分析溯源（含 v0.1 49 条、v0.2 48 条的核验记录）。v0.2 的逐条文本可在本仓库首次提交 `ce8ef7c` 中查看；`.refs/` 恢复命令在 [`README.md`](README.md) 的「来源与记录」一节。
+> **结构变更（收尾）**：规则已按场景拆分到 [`rules/`](rules/)（`base.md` 通用、`frontend.md`、`monorepo.md`），规则文本去除了来源标签并泛化为与框架/依赖无关的表述。因此 `AGENTS.merged.md`、`examples/`、`tailor/`、`tools/` 已删除；本报告与 `findings/` 保留为分析溯源（含 v0.1 49 条、v0.2 48 条的核验记录）。v0.2 的逐条文本可在本仓库首次提交 `ce8ef7c` 中查看；`.refs/` 恢复命令在 [`AGENTS.md`](AGENTS.md) 的「复核溯源」一节。溯源中的 **S** 来源已去标识：`findings/04-storage-online.md` 更名为 [`findings/04-experience.md`](findings/04-experience.md)，全仓不再出现该项目的名称与路径。
 
 ---
 
@@ -26,7 +26,7 @@
 | **P** Ponytail | `DietrichGebert/ponytail`（MIT，v4.10.0） | `e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156` | `AGENTS.md`(32) + `.agents/rules/ponytail.md`(30) + 6 个 SKILL.md(120/41/57/44/50/71) + 6 个 hook + 7 个宿主投影 + `scripts/check-*.js` + CI | `findings/01-ponytail.md`（48 条规则） |
 | **K** Karpathy 插件 | `AbdullahHameedKhan/karpathy-ponytail-skills` | `8869387dbb285d48b2582667b0f049b8d5a04a11` | 全树 5 文件：`CLAUDE.md`(104) / `AGENTS.md`(104) / `skills/…/SKILL.md`(121) / `.cursor/rules/*.mdc`(84) / `README.md`(72) | `findings/02-karpathy-plugin.md`（41 条规则） |
 | **H** DeepSeek Harness | 本地仓库（branch `master`，0.1.7-rc 发布期） | `477b4f420553e8a52c2fbccc464d7561b239c443` | 根 `AGENTS.md`(182 行/1949 词) + 17 个子树 `AGENTS.md` + `docs/*` 规范层 + 14 个 SKILL.md + `scripts/` 一层 254 个 TypeScript 脚本（含 68 个 `verify-*`）+ `lefthook.yml` + 184 个 npm scripts | `findings/03-deepseek-harness.md`（A 层 74 条 + B 层 23 个机制） |
-| **S** storage-online | `/home/leihaohao/neucloud-workspace/energy/standalone/storage-online/AGENTS.md` | 78 行（工作树版本） | 单一文件：L1–27 Vite+ 注入区块 + L29–78 人工项目约定 | `findings/04-storage-online.md`（28 条，含 10 项"规则↔现实"抽查） |
+| **S** 个人经验 | 早期自建前端项目的 `AGENTS.md`（已去标识） | 78 行（工作树版本） | 单一文件：L1–27 工具注入区块 + L29–78 人工项目约定 | `findings/04-experience.md`（28 条，含 10 项"规则↔现实"抽查） |
 
 全部取证均为只读：P/K 使用 `--depth 1` 克隆到 `.refs/`（分析后 `git status` 干净、HEAD 未变；**该副本已在收尾时删除**，恢复命令见 `README.md`「来源与记录」）；H 分析前后 `git status --short` 均为 0 行；S 未执行任何 `vp` 命令（`vp check --fix`/`build` 会写盘），源项目零改动。
 
@@ -62,7 +62,7 @@
 - **元规则**：规则文本自身有词数预算 ratchet，处置顺序 **relocate → condense → 才允许 raise**（`docs/AGENTS.md:54-58`）；编辑指令文件要改真实文件（`CLAUDE.md` 是软链，`AGENTS.md:178`）。
 - **诚实缺口**（H 分析者自查）：根 `AGENTS.md` 1949/1950 词（≈0.05% headroom）与自身"保留 ≥5% headroom"不符；`packages/client/AGENTS.md` 3479 词却不在预算 manifest 内；文档目标与 manifest 三处漂移（如 architecture.md 2,400 vs 2410）。**规则密度远高于机械覆盖**：A07/A08/A10/A11/A12/A23/A31–A33/A47–A49/A51/A54/A63–A67 全靠评审与 skill 承载，永远不会自动变红。
 
-### 2.4 S · storage-online：最小主义前端项目的可执行约定
+### 2.4 S · 个人经验：最小主义前端项目的可执行约定
 
 - **结构**：L1–27 是 **Vite+ 工具自动注入**区块（已证实：标记常量 `vite-plus/packages/cli/src/utils/agent.ts:77-78`、模板取自包内 `AGENTS.md` 且与项目 L1–27 **md5 完全相同**、`package.json:10 "prepare": "vp config"` 触发刷新、无标记不写入、永不新建 agent 文件）；L29–78 是人工约定。
 - **人工约定的取向**：**反防御式编码 + 最小化声明**——"相信类型"（`S:69`）；一次性逻辑不提取工具函数（`S:70`）；不写多余类型标注（`S:71`）；第三方边界可收窄但禁用 `as` 掩盖错误（`S:72`）；只声明与默认值不同的配置（`S:46`）；不引入未使用依赖/配置块（`S:47`）；新增依赖先做成熟度尽调（`S:44`）；按官方最新文档核对 API、不照抄旧教程（`S:45`）。
@@ -218,7 +218,7 @@
 - `findings/01-ponytail.md`（319 行 / 48 条规则）
 - `findings/02-karpathy-plugin.md`（238 行 / 41 条规则）
 - `findings/03-deepseek-harness.md`（368 行 / A 层 74 条 + B 层 23 机制）
-- `findings/04-storage-online.md`（141 行 / 28 条规则 + 10 项抽查）
+- `findings/04-experience.md`（141 行 / 28 条规则 + 10 项抽查）
 - `findings/99-verification.md`（119 行）—— 独立 verifier 的对抗性核验（41 条抽检 + 全量引用审计 + 覆盖缺口）
 
 **证据基线**
