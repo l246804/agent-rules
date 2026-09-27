@@ -1,56 +1,51 @@
-# AGENTS.md 四源融合规则集
+# 编码代理规则集
 
-一套可直接并入任意项目的 AI 编码代理规则集：把四份来源去重、消解冲突、按场景裁剪，输出一份能落地的 `AGENTS.md`。
+一套独立维护的 AI 编码代理规则：融合、去重、消解冲突后按场景拆开，规则与任何框架、依赖无关。
 
-## 文件
-
-| 路径 | 是什么 |
+| 文件 | 适用 |
 | --- | --- |
-| [`AGENTS.merged.md`](AGENTS.merged.md) | **规则源**：§0–§9 共 48 条，每条带 `[P/K/H/S:path:line]` 出处；附录含裁剪指引、落位检查清单、机械化建议 |
-| [`tailor/`](tailor/) | 裁剪工具与说明：[`README.md`](tailor/README.md)（用法）、[`PROMPT.md`](tailor/PROMPT.md)（给本地 agent 的提示词）、[`SKILL.md`](tailor/SKILL.md)（skill 模板）、`snippets/`（monorepo / frontend / machine-block） |
-| [`tools/tailor.mjs`](tools/tailor.mjs) | 裁剪器：一行命令生成项目的 `AGENTS.md`（Node ≥18，零依赖） |
-| [`examples/`](examples/) | 三档生成样例：[minimal](examples/AGENTS.minimal.md)（19 条）｜[frontend](examples/AGENTS.frontend.md)（52 条）｜[monorepo](examples/AGENTS.monorepo.md)（52 条） |
-| [`REPORT.md`](REPORT.md) | 融合分析报告：四源画像、冲突裁决、强制机制光谱、独立核验与更正记录 |
-| [`findings/`](findings/) | 四份源分析 + 独立核验报告（含逐条 `path:line` 证据） |
+| [`rules/base.md`](rules/base.md) | 通用规则，任何项目都适用 |
+| [`rules/frontend.md`](rules/frontend.md) | 前端项目，在 base 上追加 |
+| [`rules/monorepo.md`](rules/monorepo.md) | 多包仓库/多人协作，在 base 上追加 |
 
-## 用法
+## 用法一：复制这段给 agent（推荐）
 
-```bash
-# 1) 常规项目
-node tools/tailor.mjs --profile full --ci yes --out /path/to/project/AGENTS.md
+在目标项目里打开编码 agent，把下面整段贴进去；把 `<RULES_DIR>` 换成本仓库的绝对路径（如 `/home/leihaohao/workspace/agent-rules`）。新旧项目都适用。
 
-# 2) 小项目/脚本
-node tools/tailor.mjs --profile minimal --ci no --out /path/to/project/AGENTS.md
+```
+把 <RULES_DIR>/rules/ 下的规则并入本项目的规则文件：优先写进项目已有的 AGENTS.md 或 CLAUDE.md（两者都有就合并进 AGENTS.md）；没有就新建 AGENTS.md。
 
-# 3) 前端 / monorepo / 使用会改写 AGENTS.md 的工具链
-node tools/tailor.mjs --profile full --add frontend,machine-block --ci yes --out /path/to/project/AGENTS.md
-node tools/tailor.mjs --profile full --add monorepo --ci yes            --out /path/to/project/AGENTS.md
+步骤与要求：
+1. 读 <RULES_DIR>/rules/base.md；前端项目再读 frontend.md；多包仓库再读 monorepo.md。
+2. 读本项目现有的规则文件、项目结构与验证命令。
+3. 逐条并入，遵守三条边界：
+   - 已有规则与本规则冲突或语义重叠 → 跳过该条，保留项目现状；
+   - 项目专属内容（技术栈、目录、命令、约定）一律保留，不被通用规则替换；
+   - 有工具自动管理的标记区间（如 <!-- X START --> … <!-- X END -->）→ 只在区间外增改。
+4. 写完后自检：每条规则只有一个出处、没有同义重复、文件以恰好一个换行结尾、不删改无关内容。
+5. 汇报（≤8 行）：新增了哪些；跳过哪些及原因（冲突/重叠/项目已有更具体的版本）；本项目实际使用的验证命令。
 ```
 
-或让本地 agent 生成：把 [`tailor/PROMPT.md`](tailor/PROMPT.md) 中"---"之后的内容粘进 Claude Code / Codex / DSH 等（`<RULES_DIR>` 换成本仓库路径）。它会先侦察项目、给出档位建议并等你确认，再生成与合并。
+## 用法二：手动并入
 
-选项：`--profile`、`--add`、`--ci`、`--out`、`--title`、`--keep-provenance`（保留出处标签）、`--with-decisions`（附裁决记录表）、`--dry-run`。
+把 `rules/base.md`（加上对应场景文件）的内容复制进项目已有的 `AGENTS.md` 或 `CLAUDE.md`（两者都有就并进 `AGENTS.md`；都没有就新建 `AGENTS.md`）；已有内容按上面的三条边界处理。
 
-## 来源与保障
+## 维护
 
-| 标签 | 来源 | 快照 |
-| --- | --- | --- |
-| P | Ponytail（MIT） | `DietrichGebert/ponytail` @ `e3ba2aa6` |
-| K | Karpathy 插件 | `AbdullahHameedKhan/karpathy-ponytail-skills` @ `8869387` |
-| H | DeepSeek Harness | 本地仓库 @ `477b4f4` |
-| S | storage-online `AGENTS.md` | 78 行工作树版本 |
+- 规则只改 `rules/base.md`；场景差异只放对应场景文件，两处不重复。
+- 新规则先问"它是否在任何技术栈下都成立"，不成立就放进场景文件或删掉。
+- 能用一句话说清的就不要写两句；已被模型默认遵守的规则（no-op）删掉。
+- 每条规则都要能被判"做到没有"，否则改写直到可以。
+- 能机械检查的规则就配一个检查（副本一致性、生成物同步、引用完整性、格式），别只写在文档里。
+- 规则文件膨胀时按顺序处置：先搬迁到更合适的层级，再压缩，最后才允许抬高上限并说明理由。
 
-- 每条规则可回溯到出处行号；四源冲突处显式裁决（见 [`REPORT.md`](REPORT.md) §6），未静默择一。
-- 融合件经独立 verifier 对抗性核验（全量引用审计 + 抽样复核 + 增量确认），记录在 [`findings/99-verification.md`](findings/99-verification.md)。
-- 引用行号可复核：分析用的 `.refs/` 副本已从仓库删除（`.gitignore` 仍忽略该目录）；需要逐行复核时按需重新克隆：
+## 来源与记录
+
+- 规则由四份来源融合、去重、消解冲突而来（详见 [`REPORT.md`](REPORT.md)）。其中源自早期个人项目探索的部分已泛化为通用规则，不再与该项目绑定。
+- 逐条出处、冲突裁决与多轮独立核验记录在 [`findings/`](findings/)；分析稿与生成样例已随拆分删除（历史见本仓库首次提交）。
+- 引用行号需要逐行复核时，按需恢复上游副本（`.refs/` 已 gitignore）：
 
   ```bash
   git clone --depth 1 https://github.com/DietrichGebert/ponytail .refs/ponytail
   git clone --depth 1 https://github.com/AbdullahHameedKhan/karpathy-ponytail-skills .refs/karpathy-ponytail-skills
   ```
-
-## 维护
-
-1. 改规则只改 [`AGENTS.merged.md`](AGENTS.merged.md)（唯一规则源），场景差异放 `tailor/snippets/`。
-2. 改完重新生成样例并跑一次 `--dry-run` 校验条数（脚本会在规则源结构异常时报错退出）。
-3. 规则文本本身遵守自己的 R0.3：每个事实只有一个 home，超预算先搬迁再压缩。

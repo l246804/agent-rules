@@ -1,8 +1,10 @@
 # 四源 AI 编码代理规则集：融合分析报告
 
-> 分析对象：**P** Ponytail、**K** Karpathy 插件（karpathy-ponytail-skills）、**H** DeepSeek Harness、**S** storage-online 的 `AGENTS.md`
+> 分析对象：**P** Ponytail、**K** Karpathy 插件（karpathy-ponytail-skills）、**H** DeepSeek Harness、**S** 早期个人项目探索（storage-online 当时的 `AGENTS.md`）
 > 方法：4 个分析 teammate 分别产出 `findings/01–04`，Lead 融合为 `AGENTS.merged.md`，再由独立 verifier 对抗性核验（见 §10）。
 > 本报告所有条款均可回溯到 `findings/*` 中的 `path:line`；未引入四源之外的新规则。
+>
+> **结构变更（收尾）**：规则已按场景拆分到 [`rules/`](rules/)（`base.md` 通用、`frontend.md`、`monorepo.md`），规则文本去除了来源标签并泛化为与框架/依赖无关的表述。因此 `AGENTS.merged.md`、`examples/`、`tailor/`、`tools/` 已删除；本报告与 `findings/` 保留为分析溯源（含 v0.1 49 条、v0.2 48 条的核验记录）。v0.2 的逐条文本可在本仓库首次提交 `ce8ef7c` 中查看；`.refs/` 恢复命令在 [`README.md`](README.md) 的「来源与记录」一节。
 
 ---
 
@@ -26,7 +28,7 @@
 | **H** DeepSeek Harness | 本地仓库（branch `master`，0.1.7-rc 发布期） | `477b4f420553e8a52c2fbccc464d7561b239c443` | 根 `AGENTS.md`(182 行/1949 词) + 17 个子树 `AGENTS.md` + `docs/*` 规范层 + 14 个 SKILL.md + `scripts/` 一层 254 个 TypeScript 脚本（含 68 个 `verify-*`）+ `lefthook.yml` + 184 个 npm scripts | `findings/03-deepseek-harness.md`（A 层 74 条 + B 层 23 个机制） |
 | **S** storage-online | `/home/leihaohao/neucloud-workspace/energy/standalone/storage-online/AGENTS.md` | 78 行（工作树版本） | 单一文件：L1–27 Vite+ 注入区块 + L29–78 人工项目约定 | `findings/04-storage-online.md`（28 条，含 10 项"规则↔现实"抽查） |
 
-全部取证均为只读：P/K 使用 `--depth 1` 克隆到 `.refs/`（分析后 `git status` 干净、HEAD 未变；**该副本已在收尾时删除**，恢复命令见 `README.md`）；H 分析前后 `git status --short` 均为 0 行；S 未执行任何 `vp` 命令（`vp check --fix`/`build` 会写盘），源项目零改动。
+全部取证均为只读：P/K 使用 `--depth 1` 克隆到 `.refs/`（分析后 `git status` 干净、HEAD 未变；**该副本已在收尾时删除**，恢复命令见 `README.md`「来源与记录」）；H 分析前后 `git status --short` 均为 0 行；S 未执行任何 `vp` 命令（`vp check --fix`/`build` 会写盘），源项目零改动。
 
 ---
 
@@ -99,7 +101,7 @@
 
 ## 5 融合规则集的结构（落地形态）
 
-`AGENTS.merged.md` 按 §0–§9 共 10 节组织（v0.2 简化后 48 条），与内核的对应关系：
+融合到 v0.2 的 `AGENTS.merged.md` 时按 §0–§9 共 10 节组织（48 条；该文件已删除，见顶部结构变更说明），与内核的对应关系：
 
 | 组 | 内容 | 主要由谁贡献 |
 | --- | --- | --- |
@@ -131,7 +133,7 @@
 
 另有两处**同文件内部张力**（分析者已记录，未代作者消解，融合时按上述裁决处理）：K 自己 `CLAUDE.md:40`（Deletion over addition）vs `:72`；P 的阶梯第 5 级（不新增依赖）vs 护栏（"安全措施绝不简化"）在"是否引入经审计的安全库"场景无优先级定义——融合条款 R9.4 明确"安全红线优先于最小化"。
 
-**条件式映射核对**：C1→R5.1、C2→R6.3、C3→R1.4、C4→R3.3、C5→R3.2、C7→R5.3、C8→R9.3 共 7 条已在 `AGENTS.merged.md` 标注 ⟨条件式⟩；**C6→R8.3 未标**，因为该裁决（改动影响文档就同步，但不为未请求的文档写作）不依赖项目取舍、且在四源内无反对条款，故按强规则写入，两侧原文仍完整保留在本表中。
+**条件式映射核对**：C1→R5.1、C2→R6.3、C3→R1.4、C4→R3.3、C5→R3.2、C7→R5.3、C8→R9.3 共 7 条已在 `AGENTS.merged.md`（已删除）标注 ⟨条件式⟩；**C6→R8.3 未标**，因为该裁决（改动影响文档就同步，但不为未请求的文档写作）不依赖项目取舍、且在四源内无反对条款，故按强规则写入，两侧原文仍完整保留在本表中。
 
 ---
 
@@ -153,7 +155,7 @@
 
 ## 8 落地建议
 
-1. **并入任意项目**：复制 `AGENTS.merged.md` → 与项目现有 `AGENTS.md` 合并（保留项目专属段落；若项目使用会自动写 `AGENTS.md` 的工具，把人工内容写在注入区间之外）。
+1. **并入任意项目**：复制 `rules/base.md`（前端项目再加 `rules/frontend.md`，多包仓库再加 `rules/monorepo.md`）的内容 → 与项目现有规则文件合并（保留项目专属段落；若项目使用会自动写 `AGENTS.md` 的工具，把人工内容写在注入区间之外）。也可以直接用 [`README.md`](README.md) 的提示词交给 agent 完成。
 2. **先裁后并**：按附录 A 的三档（最小配置/大型 monorepo/前端项目）决定启用哪些组；7 条 ⟨条件式⟩ 条款必须先做一次项目内裁决（依据 §6）。
 3. **机械化优先级**（投入产出比排序）：① 规则副本一致性（若多宿主投影）；② 生成物 `--check`；③ 类型逃逸 ratchet；④ 一段一个物理行 + 本地链接可达；⑤ 门禁编排把 skip 当 failed。
 4. **维护机制**：规则文件本身设词数上限，超限按 relocate → condense → raise 处理；项目变更导致规则与现实不符时，优先改规则或改配置（像 S 的 P11 那样把含糊措辞改成可验证表述）。
@@ -205,13 +207,14 @@
 - **待复核**：本条所述为 Lead 自查；简化后的 48 条与四源出处的对应关系需 verifier 再核（见本文件 §9.1 的复核流程）。
 - **v0.2 复核结果（verifier 第四轮）**：语义保真 12/12、引用可回溯、产物自检通过，判定"可对外引用"；提出 3 项必须修正，已全部修复——① R3.3 恢复 ⟨条件式⟩ 标记（与 A.5 清单一致）；② `minimal` 档补回 R9.4（安全红线），18→19 条；③ base↔snippet 去重（`frontend` 片段由 6 条减到 2 条、`monorepo` 由 5 条减到 4 条，其余由 base 的 R3.5/R2.4/R6.6/R5.4/R8.2 覆盖）。同时补回压缩中丢失的源要求（R9.1 裸 `--force`、R0.3 论证、R2.2 防御性拷贝、R7.3 精确名词、R6.1 无框架/fixture、R6.3 快照出处）。
 - **v0.2 收尾（verifier 第五轮 + Lead 微调）**：第五轮 7 项全 PASS，唯一残项为本文一处数字（18 条/45 行 → 已改为 19 条/46 行）。随后两处非阻塞优化已应用：`monorepo` R10.3 改为只讲"子包 README 记录可消费信息"（去掉与 R8.3 重复的同提交句）；A.2 补回"根文件只放常设指令、细节下沉子树"的层级规则 `[H:docs/AGENTS.md:21-22]`。**未采纳**：`S:25`（`vp env doctor`）属 Vite+ 注入区块的专属命令，按 A.4 的边界原则不进入通用条款，仅保留在 `machine-block` 场景说明中。
+- **场景拆分（verifier 第七轮）**：按"规则必须与框架/依赖无关"重写为 `rules/base.md`（35 条）+ `frontend.md`（3 条）+ `monorepo.md`（6 条），并删除合并稿与工具链。verifier 复核：框架/依赖名零命中、无语义失真、三条文件无重复、README 提示词可执行；同时指出三处缺口，已修复——R6.3（测试重量级按 CI 定）与 R6.4（权限/沙箱阻塞时的升级协议）补回为通用条款；**R0.1（决策即执行/enforcement）判定为可删**（对代理是抽象元规则，接近 no-op），连同其他有意收窄项一并记在此处：R1.3 并入"不确定就问"、R2.2/R2.3 合并为"只建有当前使用者的东西"、R3.4 由阶梯与"改动限于请求范围"覆盖、R4.4（判别式 switch）与 R8.4（审查只列不改）属语言/工作流专属、R0.2/R0.3 移入 README「维护」。另修掉 README↔REPORT 的循环指针（`.refs/` 恢复命令现只在 README「来源与记录」一处）。
 
 ---
 
 ## 10 溯源附录
 
 **产出物**
-- `AGENTS.merged.md` —— 融合规则集（§0–§9 共 10 节、v0.2 简化后 48 条规则 + 3 个附录）
+- `AGENTS.merged.md` —— 融合规则集（§0–§9 共 10 节、v0.2 简化后 48 条规则 + 3 个附录）**已删除**，其内容按场景拆分进 [`rules/`](rules/)（首次提交 `ce8ef7c` 保留原文）
 - `findings/01-ponytail.md`（319 行 / 48 条规则）
 - `findings/02-karpathy-plugin.md`（238 行 / 41 条规则）
 - `findings/03-deepseek-harness.md`（368 行 / A 层 74 条 + B 层 23 机制）
@@ -228,4 +231,4 @@
 
 **独立核验**（详见 `findings/99-verification.md`）：核验者以 fresh 上下文抽样打开被引用的原始文件与行号，检查引用文本存在性、规则/营销的区分、中文归纳是否夸大、融合件是否无源、冲突是否被静默择一、统计断言是否属实。
 
-**本地参考副本（已删除）**：`.refs/ponytail`、`.refs/karpathy-ponytail-skills`（`--depth 1` 克隆，仅用于本次分析；收尾时按用户要求删除）。需要复核 `[P:…]`/`[K:…]` 行号时，用 `README.md`「来源与保障」一节的克隆命令按需恢复。
+**本地参考副本（已删除）**：`.refs/ponytail`、`.refs/karpathy-ponytail-skills`（`--depth 1` 克隆，仅用于本次分析；收尾时按用户要求删除）。需要复核 `[P:…]`/`[K:…]` 行号时，用 `README.md`「来源与记录」一节的两条 `git clone --depth 1` 命令按需恢复。
