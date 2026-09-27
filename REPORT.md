@@ -28,7 +28,7 @@
 | **H** DeepSeek Harness | 本地仓库（branch `master`，0.1.7-rc 发布期） | `477b4f420553e8a52c2fbccc464d7561b239c443` | 根 `AGENTS.md`(182 行/1949 词) + 17 个子树 `AGENTS.md` + `docs/*` 规范层 + 14 个 SKILL.md + `scripts/` 一层 254 个 TypeScript 脚本（含 68 个 `verify-*`）+ `lefthook.yml` + 184 个 npm scripts | `findings/03-deepseek-harness.md`（A 层 74 条 + B 层 23 个机制） |
 | **S** 个人经验 | 早期自建前端项目的 `AGENTS.md`（已去标识） | 78 行（工作树版本） | 单一文件：L1–27 工具注入区块 + L29–78 人工项目约定 | `findings/04-experience.md`（28 条，含 10 项"规则↔现实"抽查） |
 
-全部取证均为只读：P/K 使用 `--depth 1` 克隆到 `.refs/`（分析后 `git status` 干净、HEAD 未变；**该副本已在收尾时删除**，恢复命令见 `README.md`「来源与记录」）；H 分析前后 `git status --short` 均为 0 行；S 未执行任何 `vp` 命令（`vp check --fix`/`build` 会写盘），源项目零改动。
+全部取证均为只读：P/K 使用 `--depth 1` 克隆到 `.refs/`（分析后 `git status` 干净、HEAD 未变；**该副本已在收尾时删除**，恢复命令见 `AGENTS.md`「复核溯源」）；H 分析前后 `git status --short` 均为 0 行；S 未执行任何 `vp` 命令（`vp check --fix`/`build` 会写盘），源项目零改动。
 
 ---
 
@@ -231,4 +231,4 @@
 
 **独立核验**（详见 `findings/99-verification.md`）：核验者以 fresh 上下文抽样打开被引用的原始文件与行号，检查引用文本存在性、规则/营销的区分、中文归纳是否夸大、融合件是否无源、冲突是否被静默择一、统计断言是否属实。
 
-**本地参考副本（已删除）**：`.refs/ponytail`、`.refs/karpathy-ponytail-skills`（`--depth 1` 克隆，仅用于本次分析；收尾时按用户要求删除）。需要复核 `[P:…]`/`[K:…]` 行号时，用 `README.md`「来源与记录」一节的两条 `git clone --depth 1` 命令按需恢复。
+**本地参考副本（已删除）**：`.refs/ponytail`、`.refs/karpathy-ponytail-skills`（`--depth 1` 克隆，仅用于本次分析；收尾时按用户要求删除）。需要复核 `[P:…]`/`[K:…]` 行号时，用 `AGENTS.md`「复核溯源」一节的两条 `git clone --depth 1` 命令按需恢复。

@@ -255,3 +255,26 @@
 
 **最终判定**：44 条规则（35+3+6）+ README（可达的恢复命令、可执行提示词）+ 溯源（REPORT/findings）**均可对外引用**；第八轮 6 项全部到位，仅剩 3 处低残（Z2a 措辞收窄、Z4 的 `:136`、Z7 的用法二），不构成引用障碍。
 **口径提示**：本文件现 **257 行**，超出最初 ≤250 行的约定（追加式复核所致）；建议把 §6–§10（历史轮次）归档另存后重编号，或把该上限更新为随轮次增长的口径。
+
+## 13 结构复核（第九轮）
+
+**基线**：`git status` 干净、全部已提交（HEAD `935c569`，分支 `dev`，origin `git@github.com:l246804/agent-rules.git`）；新增仓库 `AGENTS.md`（31 行）、README 重写（40 行）、`findings/04-storage-online.md` → `04-experience.md`；`rules/` 自 636138f 起未变更。
+
+| # | 核验项 | 证据（命令/读原文） | 结论 |
+|---|---|---|---|
+| N1 | 零残留：旧文件名 / 旧项目名 / 旧绝对路径 | `grep -rn` 全工作树（排除 `.git`/`.refs`，含隐藏文件）：`04-storage-online` 0 命中、`storage-online` 0、`/home/leihaohao/neucloud-workspace/...` 0；提交信息亦 0 命中 | PASS（部分，见 N1a） |
+| N1a | findings/ 仍有项目标识 | Lead 声明的 5 项（标题/源路径/模板路径/定位句/方法句）已落地 ✓；但 `findings/04-experience.md` 正文仍含：`:95` `title:"储能在线"`（项目显示名）、`:104` `@neucloud/admin-service`（公司名）、`:61,:104` `admin-service`、`:136,:138` `portal-embed`；另有 ~12 处项目内部相对路径（`src/layouts/*`、`src/routes/**`、`src/stores/*`、`routeTree.gen.ts`、`vite.config.ts`、`.vite-hooks/`、`pnpm-workspace.yaml`）与依赖栈（React 19/antd/TanStack/pro-components）。**且 `:3` 自称"不出现项目名与仓库路径"与内容不符** | **FAIL(中)**：正文改名（储能在线→"示例项目"、`@neucloud/*`→"内部服务包"、`admin-service`→"应用级模块"、`portal-embed`→"项目内文档"）或把 `:3` 的声明收窄为"标题/定位/方法/绝对路径已去标识，正文证据保留项目相对路径与依赖栈" |
+| N2 | 提示词：形态优先 + 只提 AGENTS.md + 边界/自检/汇报 | `README:16-20` 先判形态再读、不确定时只读通用并说明依据；`README:22,26` 只提 `AGENTS.md`；`README:27-32` 三条边界 + 自检 + ≤8 行汇报；`README:25` 增"链接读不到就说明，不要凭猜" | PASS |
+| N2a | 链接结构正确 | `README:17-19` 的 owner/repo = `l246804/agent-rules` ↔ `origin` 一致；分支 `dev` ↔ 当前分支一致；路径 `rules/{base,frontend,monorepo}.md` 均存在；`README:35` 附仓库地址与"分支改名需同步"提示 | 结构 PASS |
+| N2b | 链接可达性 | `git ls-remote origin` 失败（SSH 配置/网络）；`web_fetch` 被沙箱拒绝（非公网 IP） | **UNVERIFIED**（无法验证远端是否已有 `dev` 分支/是否公开） |
+| N3 | README↔AGENTS.md 无重复条目 | README = 介绍 + 文件表 + 提示词 + 仓库地址 + 两行指针（40 行）；AGENTS.md = 结构/改规则/复核溯源（31 行）；clone 命令现仅存 `AGENTS.md:26-29` 一处（README 已移除）。低：`README:7-9` 的文件↔场景表与 `AGENTS.md:7` 的"场景文件只放追加"是同一映射的两面（选型 vs 维护），可接受 | PASS（1 低） |
+| N4 | 写法与可维护性（writing-for-agents） | AGENTS.md 首行给定位与指针 ✓；`:18` 要求正面表述 ✓；31 行无 sprawl ✓；"改规则" 8 条均可执行 ✓ | PASS（3 缺口见 N4a–c） |
+| N4a | 缺"改完怎么验证" | AGENTS.md 无自检/验证步骤，与 `rules/base.md:38`"没检查的改动算未完成"不一致；建议补"改完自检：三条规则文件 `grep` 无框架/依赖名、无重名规则、计数不变，README 提示词链接可达" | 中低 |
+| N4b | `:20` 的机械检查条目在本仓库无落点 | 本仓库无 `tools/`、无 CI、无检查脚本 → "配一个检查"指向不明（指目标项目的规则内容，还是本仓库自身？） | 低 |
+| N4c | 未指向随仓库分发的技能 | 仓库自带 `.agents/skills/writing-for-agents/`（已跟踪），而"改规则"正是其适用场景，AGENTS.md 未加指针 | 低 |
+| N5 | 溯源一致性（S 改述与新文件名） | `REPORT:3,:29,:65` S 已改为"个人经验/早期自建项目（已去标识）"；`REPORT:221`（§10）与 `findings/03:307` 均指向 `findings/04-experience.md`；`AGENTS.md:31` 一致；旧文件名全仓 0 命中 | PASS |
+| N5a | **REPORT 的恢复命令指针已失效** | `REPORT:31`"恢复命令见 `README.md`「来源与记录」"、`REPORT:234`"用 `README.md`「来源与记录」一节的两条 `git clone --depth 1`"——但 README 现仅有「用法」「更多」两节且已无 clone 命令（命令移至 `AGENTS.md:24-29`「复核溯源」）→ 悬空指针（第八轮 Z3 的回归） | **FAIL(中低)**：两处改为 `AGENTS.md`「复核溯源」 |
+| N6 | rules 未变更且仍满足先前判定 | `git log -- rules/` 仅 636138f、`git diff 636138f..HEAD --stat -- rules/` 为空；计数 35/3/6；拉丁 token 不变（`CI`×3、`README`、`YAGNI`、`API` + 交叉引用文件名）；两两 jaccard>0.28 = 0 对 | PASS |
+
+**最终判定**：当前仓库（rules 44 条 + README 提示词 + 仓库 AGENTS.md + 溯源）**可对外引用**；建议先修 2 处——① N5a 的 REPORT 悬空指针（改指 `AGENTS.md`「复核溯源」）；② N1a 的 findings/04 残留标识（或收窄其 `:3` 的声明）。N2b 的链接可达性需在有公网的环境验证一次；N4a–c 为可选补强。
+**口径提示（更新）**：本文件现 **280 行**（§12 所记 257 行为当时值），已于第七轮起持续超出最初 ≤250 行约定；建议把 §6–§12（历史轮次）归档到 `findings/99-archive.md` 后重编号，或把上限改为"每轮新增 ≤40 行"。

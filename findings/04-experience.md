@@ -1,6 +1,6 @@
 # 04 · 个人经验溯源：早期自建前端项目的 AGENTS.md 规则提取（task-4）
 
-> 该项目已去标识：下文统一称"该项目"，不出现项目名与仓库路径。规则已泛化进 `rules/`，本文件仅作溯源记录。
+> 该项目已去标识：项目名、产品名、公司包名与仓库绝对路径均已移除；下文统一称"该项目"，保留的是技术栈与项目内相对文件路径（作为证据）。规则已泛化进 `rules/`，本文件仅作溯源记录。
 
 ## 0 溯源
 
@@ -58,7 +58,7 @@
 | P5 | 安装后按官方**最新**文档核对 API 与配置项，不照抄旧教程（例：`TanStackRouterVite` 已废弃 → 用 `tanstackRouter`） | "安装后按官方最新文档核对 API 与配置项，不要照抄旧教程" | L45 | 依赖/API 正确性 | 强制 | [可泛化]★ |
 | P6 | 写配置前先确认该项是否必需、工具默认值是否已满足需求，**只声明与默认值不同的部分** | "只声明与默认值不同的部分" | L46 | 配置冗余 | 强制 | [可泛化]★★ |
 | P7 | 不引入未被使用的依赖和配置块；某包已完整 re-export 另一包时只声明前者、从同一入口导入 | "不引入未被使用的依赖和配置块" / "只声明前者，从同一入口导入即可" | L47 | 依赖/配置冗余 | 强制 | [可泛化]★★ |
-| P8 | 新增文件必须落入约定目录，各目录职责固定（入口/路由/布局/状态/应用级模块） | "`src/` … `routes/` 文件式路由，页面组件直接写在这里 … `modules/` 单点登录、admin-service 初始化等应用级模块" | L51–60 | 分层 | 强制 | [项目专属]※ |
+| P8 | 新增文件必须落入约定目录，各目录职责固定（入口/路由/布局/状态/应用级模块） | "`src/` … `routes/` 文件式路由，页面组件直接写在这里 … `modules/` 单点登录、鉴权服务初始化等应用级模块" | L51–60 | 分层 | 强制 | [项目专属]※ |
 | P9 | 跨目录引用统一用 `@/` 前缀，同目录内用相对路径 | "跨目录引用统一用 `@/` 前缀（由 `tsconfig.json` 的 `paths` 与 `vite.config.ts` 的 `resolve.tsconfigPaths` 提供），同目录内用相对路径。" | L62 | 导入风格 | 强制 | [可泛化]※ |
 | P10 | 页面组件就近写在对应路由文件里，不额外包一层 `pages/`；仅被多处复用的 UI 才提取为公共组件 | "页面组件就近写在对应路由文件里，不要再包一层 `pages/`；只有被多处复用的 UI 才提取为公共组件。" | L63 | 代码组织 | 强制 | [可泛化]★ |
 | P11 | 新增路由后让插件重新生成 `routeTree.gen.ts`；不手写 `createFileRoute` 的路径字符串，不手改生成结果 | "新增路由后让插件重新生成 `routeTree.gen.ts`，不要手写 `createFileRoute` 的路径字符串，也不要手改生成结果。" | L64 | 生成物 | 强制 | [项目专属]※ |
@@ -92,7 +92,7 @@
 
 | # | 被抽查规则 | 证据（只读） | 结论 |
 | --- | --- | --- | --- |
-| 1 | P6 只声明与默认值不同的配置 | `src/layouts/settings.ts:11-15` 仅声明 3 键：`title:"储能在线"`、`layout:"mix"`、`fixedHeader:true`。独立核对库内置默认值：`node_modules/.pnpm/@ant-design+pro-components@3.1.14-7_*/node_modules/@ant-design/pro-components/es/layout/defaultSettings.js` = `{navTheme:'light', layout:'side', contentWidth:'Fluid', fixedHeader:false, fixSiderbar:true, iconfontUrl:'', colorPrimary:'#1677FF', splitMenus:false}`。⇒ `title` 无默认值、`layout:"mix"≠'side'`、`fixedHeader:true≠false`，三项全部「非默认」；文件 L6-9 注释列出的默认值清单与该文件逐项吻合（仅漏列 `iconfontUrl`） | **一致** |
+| 1 | P6 只声明与默认值不同的配置 | `src/layouts/settings.ts:11-15` 仅声明 3 键：`title:"<产品名>"`、`layout:"mix"`、`fixedHeader:true`。独立核对库内置默认值：`node_modules/.pnpm/@ant-design+pro-components@3.1.14-7_*/node_modules/@ant-design/pro-components/es/layout/defaultSettings.js` = `{navTheme:'light', layout:'side', contentWidth:'Fluid', fixedHeader:false, fixSiderbar:true, iconfontUrl:'', colorPrimary:'#1677FF', splitMenus:false}`。⇒ `title` 无默认值、`layout:"mix"≠'side'`、`fixedHeader:true≠false`，三项全部「非默认」；文件 L6-9 注释列出的默认值清单与该文件逐项吻合（仅漏列 `iconfontUrl`） | **一致** |
 | 2 | P5（用 `tanstackRouter` 而非已废弃名）+ P13（生成物排除 fmt/lint） | `vite.config.ts:16` `plugins: [tanstackRouter({ autoCodeSplitting: true }), react()]`；`:26` `fmt.ignorePatterns: ["src/routeTree.gen.ts"]`；`:29` `lint.ignorePatterns: ["src/routeTree.gen.ts"]`。弃用名仍存在但确已标注：`node_modules/@tanstack/router-plugin/dist/esm/vite.js:46` `* @deprecated Use `tanstackRouter` instead.`、`:48` `var TanStackRouterVite = tanstackRouter;`。`fmt`/`lint` 是真实配置键：`vite-plus/dist/define-config-DPNEJxPz.d.ts:177-178`、`vite-plus/docs/config/fmt.md:12`、`vite-plus/docs/config/lint.md:12` | **一致** |
 | 3 | P8 目录分层 | `find src -type f`：`main.tsx`、`router.tsx`、`routeTree.gen.ts`、`routes/{__root,_app,_app/*}`、`layouts/{settings.ts,menu.tsx,app-layout.tsx}`、`stores/{layout,user}.ts`、`modules/{sso,admin}.ts`、`vite-env.d.ts` —— 与 L51-60 分层图逐项对应；且**不存在 `src/pages/`**（同时支持 P10） | **一致** |
 | 4 | P7 re-export 只声明上游包 | `package.json` 依赖仅 `@tanstack/react-store@0.11.1`，无 `@tanstack/store`；`@tanstack/react-store/src/index.ts:1` = `export * from '@tanstack/store'`，其 `package.json` 把 `@tanstack/store` 列为自身 dependency ⇒ 规则描述与包现状完全相符 | **一致** |
@@ -101,7 +101,7 @@
 | 7 | P11「不要手写 `createFileRoute` 的路径字符串」 | 6 个路由文件均含字面量路径字符串，如 `src/routes/_app/examples/form.tsx:5` `createFileRoute("/_app/examples/form")`；但每处都与文件路径严格 1:1 对应，且 `src/routeTree.gen.ts:1-8` 保留生成头、无手改痕迹 | **部分一致（措辞张力）** |
 | 8 | P12「`routeTree.gen.ts` 需要提交」 | `git ls-files src/routeTree.gen.ts` 无输出（未跟踪）；但 `git check-ignore -v src/routeTree.gen.ts` 亦无输出（未被 `.gitignore` 忽略），且 `git status --short` 显示 `?? src/routes/`、`?? src/stores/`、`?? src/layouts/` 等整个重构均未提交 ⇒ 属「工作树未提交」，非违反规则 | **无法验证（尚未提交）** |
 | 9 | P14 不吞异常 + P17 不用 `as` | `src`（排除 `routeTree.gen.ts`）内 `as X`/`as any`/`as unknown` 零命中；`try {`/`catch` 仅 1 处：`src/stores/user.ts:26` `.catch(() => {})`，其 JSDoc（L19-22）明示「获取失败不阻塞页面渲染，令牌失效由 HCRefreshToken 负责跳转」⇒ 有意降级设计，非无差别吞异常 | **一致（1 处需人工判读）** |
-| 10 | P7「不引入未被使用的依赖」 | `package.json` 全部依赖均可在 `src`/配置中找到使用点：`@ant-design/icons`→`src/layouts/menu.tsx:6`、`src/layouts/app-layout.tsx:1`；`@tanstack/react-router-devtools`→`src/routes/__root.tsx:1,12`；`vite-proxy-from-env`→`vite.config.ts:3,13`；`@neucloud/admin-service`→`src/stores/user.ts:1` | **一致** |
+| 10 | P7「不引入未被使用的依赖」 | `package.json` 全部依赖均可在 `src`/配置中找到使用点：`@ant-design/icons`→`src/layouts/menu.tsx:6`、`src/layouts/app-layout.tsx:1`；`@tanstack/react-router-devtools`→`src/routes/__root.tsx:1,12`；`vite-proxy-from-env`→`vite.config.ts:3,13`；内部鉴权服务包→`src/stores/user.ts:1` | **一致** |
 
 结论：规则与现实的吻合度高（8 项一致 / 1 项部分一致 / 1 项无法验证）；「部分一致」集中在 P11 的表述可验证性上，「无法验证」是工作树未提交所致，二者都不构成对规则本身的否定。
 
@@ -133,9 +133,9 @@
 
 - **未执行任何 `vp` 命令**：`vp check`/`vp test`/`vp build` 都可能写盘（缓存、`dist/`、`--fix` 改源文件），与「源项目只读」硬约束冲突，故有意不跑。因此 P18/P19 只验证了「规则存在 + 配置项真实」，**未验证当前代码能否通过 check/test** —— 该结论标记为「无法验证」。
 - **注入来源的证据强度**：证据链为「标记常量（`agent.ts:77-78`）+ 包内模板 md5 一致 + `prepare` 钩子 + RFC 设计说明 + 快照测试 + `git diff` 显示 END 后追加」。未观察到一次真实的 `vp config` 运行日志；`.vite-hooks/` 与 `core.hooksPath` 只能证明该命令曾在本项目执行过，**无法证明最近一次刷新的时间点**。结论「工具自动注入」置信度高，但「注入时间线」不确定。
-- **P11 的措辞张力**：AGENTS.md 说「不要手写 `createFileRoute` 的路径字符串」，实测 6 个路由文件都含有字面量路径字符串（与文件路径严格一致）。合理推断其本意为「路径由文件位置决定、不得臆造，且不得手工维护 `routeTree.gen.ts`」，但未找到更明确的说明（项目 `docs/` 仅有 `portal-embed-bridge.md`）。**建议融合时改写为可验证表述**：「路由路径由文件位置决定，路径字符串须与文件路径严格一致；`routeTree.gen.ts` 不得手改」。
+- **P11 的措辞张力**：AGENTS.md 说「不要手写 `createFileRoute` 的路径字符串」，实测 6 个路由文件都含有字面量路径字符串（与文件路径严格一致）。合理推断其本意为「路径由文件位置决定、不得臆造，且不得手工维护 `routeTree.gen.ts`」，但未找到更明确的说明（项目 `docs/` 下与路由无关）。**建议融合时改写为可验证表述**：「路由路径由文件位置决定，路径字符串须与文件路径严格一致；`routeTree.gen.ts` 不得手改」。
 - **P12「需要提交」的判定**：`git status` 显示整个重构（`src/routes/`、`src/stores/`、`src/layouts/` 等）均未提交，属工作树中间态，因此无法据当前 git 状态确认该规则被遵守或违反。
-- **未做的事**：未做网络检索；未核验 antd 6 / Pro Components 3 / TanStack 各包的版本兼容矩阵（超出规则提取范围）；未审计 `docs/portal-embed-bridge.md` 与 `src/modules/*` 的业务语义。
+- **未做的事**：未做网络检索；未核验 antd 6 / Pro Components 3 / TanStack 各包的版本兼容矩阵（超出规则提取范围）；未审计该项目的业务语义。
 - **方法**：全部结论来自只读命令（`read`、`cat`、`ls`、`find`、`grep`、`git status|diff|ls-files|check-ignore`、`md5sum`、`diff`）。本次仅写入 `findings/04-experience.md` 一个文件，源项目零改动。
 
 **更正记录（Lead 复核，依据 `findings/99-verification.md`）**
