@@ -258,12 +258,12 @@
 
 ## 13 结构复核（第九轮）
 
-**基线**：`git status` 干净、全部已提交（HEAD `935c569`，分支 `dev`，origin `git@github.com:l246804/agent-rules.git`）；新增仓库 `AGENTS.md`（31 行）、README 重写（40 行）、`findings/04-storage-online.md` → `04-experience.md`；`rules/` 自 636138f 起未变更。
+**基线**：`git status` 干净、全部已提交（HEAD `935c569`，分支 `dev`，origin `git@github.com:l246804/agent-rules.git`）；新增仓库 `AGENTS.md`（31 行）、README 重写（40 行）、`findings/04`（旧文件名含项目标识）→ `04-experience.md`；`rules/` 自 636138f 起未变更。
 
 | # | 核验项 | 证据（命令/读原文） | 结论 |
 |---|---|---|---|
-| N1 | 零残留：旧文件名 / 旧项目名 / 旧绝对路径 | `grep -rn` 全工作树（排除 `.git`/`.refs`，含隐藏文件）：`04-storage-online` 0 命中、`storage-online` 0、`/home/leihaohao/neucloud-workspace/...` 0；提交信息亦 0 命中 | PASS（部分，见 N1a） |
-| N1a | findings/ 仍有项目标识 | Lead 声明的 5 项（标题/源路径/模板路径/定位句/方法句）已落地 ✓；但 `findings/04-experience.md` 正文仍含：`:95` `title:"储能在线"`（项目显示名）、`:104` `@neucloud/admin-service`（公司名）、`:61,:104` `admin-service`、`:136,:138` `portal-embed`；另有 ~12 处项目内部相对路径（`src/layouts/*`、`src/routes/**`、`src/stores/*`、`routeTree.gen.ts`、`vite.config.ts`、`.vite-hooks/`、`pnpm-workspace.yaml`）与依赖栈（React 19/antd/TanStack/pro-components）。**且 `:3` 自称"不出现项目名与仓库路径"与内容不符** | **FAIL(中)**：正文改名（储能在线→"示例项目"、`@neucloud/*`→"内部服务包"、`admin-service`→"应用级模块"、`portal-embed`→"项目内文档"）或把 `:3` 的声明收窄为"标题/定位/方法/绝对路径已去标识，正文证据保留项目相对路径与依赖栈" |
+| N1 | 零残留：旧文件名 / 旧项目名 / 旧绝对路径 | `grep -rn` 全工作树（排除 `.git`/`.refs`，含隐藏文件）：旧文件名 0 命中、旧项目名/slug 0 命中、旧绝对路径 0 命中；提交信息亦 0 命中 | PASS（部分，见 N1a） |
+| N1a | findings/ 仍有项目标识 | Lead 声明的 5 项（标题/源路径/模板路径/定位句/方法句）已落地 ✓；但 `findings/04-experience.md` 正文仍含：`:95` 1 处产品名、`:104` 1 处公司包名、`:61,:104` 鉴权服务名、`:136,:138` 项目内文档名；另有 ~12 处项目内部相对路径（`src/layouts/*`、`src/routes/**`、`src/stores/*`、`routeTree.gen.ts`、`vite.config.ts`、`.vite-hooks/`、`pnpm-workspace.yaml`）与依赖栈（React 19/antd/TanStack/pro-components）。**且 `:3` 自称"不出现项目名与仓库路径"与内容不符** | **FAIL(中)**：正文改名（产品名→占位符、公司包名→"内部服务包"、鉴权服务名→"应用级模块"、项目内文档名→"项目内文档"）或把 `:3` 的声明收窄为"标题/定位/方法/绝对路径已去标识，正文证据保留项目相对路径与依赖栈" |
 | N2 | 提示词：形态优先 + 只提 AGENTS.md + 边界/自检/汇报 | `README:16-20` 先判形态再读、不确定时只读通用并说明依据；`README:22,26` 只提 `AGENTS.md`；`README:27-32` 三条边界 + 自检 + ≤8 行汇报；`README:25` 增"链接读不到就说明，不要凭猜" | PASS |
 | N2a | 链接结构正确 | `README:17-19` 的 owner/repo = `l246804/agent-rules` ↔ `origin` 一致；分支 `dev` ↔ 当前分支一致；路径 `rules/{base,frontend,monorepo}.md` 均存在；`README:35` 附仓库地址与"分支改名需同步"提示 | 结构 PASS |
 | N2b | 链接可达性 | `git ls-remote origin` 失败（SSH 配置/网络）；`web_fetch` 被沙箱拒绝（非公网 IP） | **UNVERIFIED**（无法验证远端是否已有 `dev` 分支/是否公开） |
@@ -278,3 +278,18 @@
 
 **最终判定**：当前仓库（rules 44 条 + README 提示词 + 仓库 AGENTS.md + 溯源）**可对外引用**；建议先修 2 处——① N5a 的 REPORT 悬空指针（改指 `AGENTS.md`「复核溯源」）；② N1a 的 findings/04 残留标识（或收窄其 `:3` 的声明）。N2b 的链接可达性需在有公网的环境验证一次；N4a–c 为可选补强。
 **口径提示（更新）**：本文件现 **280 行**（§12 所记 257 行为当时值），已于第七轮起持续超出最初 ≤250 行约定；建议把 §6–§12（历史轮次）归档到 `findings/99-archive.md` 后重编号，或把上限改为"每轮新增 ≤40 行"。
+
+## 14 收尾复核（第十轮）
+
+**第一步（本文件的标识清理）**：改写 §13 的基线行、N1 行、N1a 行共 3 处，把其中的旧文件名/slug、产品名、公司包名、项目内文档名替换为描述性说法（"旧文件名 0 命中"、"1 处产品名/公司包名/鉴权服务名/项目内文档名"），**结论与 severity 未变**（N1 仍 PASS-部分，N1a 仍 FAIL(中)）。改后 `grep -rniE '旧slug|产品名|公司包名|文档名'` 保留描述、标识字符串 0 命中。
+
+| # | 核验点 | 证据（命令/读原文） | 结论 |
+|---|---|---|---|
+| P1 | 本文件标识清零 | 以第五轮起沿用的 5 项标识词表（旧文件名/slug、产品名、公司/组织名、旧服务名、旧文档名）grep 本文件 → 0 命中（改写前 §261/§265/§266 共 3 行命中） | PASS |
+| P2 | 全仓标识零命中（含隐藏文件、排除 `.git`/`.refs`） | 同一词表对整工作树 → **0 命中**；`git log --format='%s'` 提交信息亦 0 命中；`.agents/`、`.gitignore`、`skills-lock.json` 均覆盖 | PASS |
+| P3 | `findings/04-experience.md` 声明与内容一致 | `:3` 收窄为"项目名、产品名、公司包名与仓库绝对路径均已移除；保留技术栈与项目内相对文件路径"；实测：`:95` `title:"<产品名>"`、`:104` "内部鉴权服务包"、`:61` "应用级模块"、`:136/:138` 文档名已去；保留 7 处技术栈 + 20 处 `src/` 相对路径，全部落在声明的"保留"范围内 | PASS |
+| P4 | REPORT 恢复命令指针可达 | `REPORT:31` → "恢复命令见 `AGENTS.md`「复核溯源」"；`REPORT:234` → "用 `AGENTS.md`「复核溯源」一节的两条 `git clone --depth 1` 命令"；`AGENTS.md:23` 该节存在、`:27-28` 两条命令齐备 → 指针可达（`git clone` 单点：README 0、AGENTS.md 2、REPORT 1） | PASS |
+| P5 | `AGENTS.md` 改造后无新重复、仍能指导维护 | 已删"机械检查"条目（全仓该概念 0 命中，本仓库确无检查脚本落点）；新增 `:20`"改完自检：三条规则文件之间零重复、无框架或依赖名、每条都能判'做到没有'"与 `:21` 指向 `.agents/skills/writing-for-agents/SKILL.md`；14 条 bullet 两两 bigram-jaccard>0.22 = **0 对**；结构/改规则/复核溯源三段覆盖维护全流程 | PASS |
+| P6 | 残余低项（历史记录） | `REPORT:210`（第七轮记录）仍写"恢复命令现只在 README「来源与记录」一处"，且同句称"R0.2/R0.3 移入 README「维护」"——前者已被第九/十轮改指 `AGENTS.md`，后者随 README 去"维护"节与本轮删除而不再成立；两处均属轮次留痕 | 低（可加"(后改为 AGENTS.md)"或按历史记录接受） |
+
+**最终判定**：本文件与整仓**标识已清零**（含隐藏文件与提交信息），`findings/04` 的声明与内容自洽，REPORT 恢复命令指针可达，仓库 `AGENTS.md` 已补自检与技能指针且无新重复 —— **整仓（rules 44 条 + README + AGENTS.md + 溯源）可对外引用**；仅 `REPORT:210` 的两处历史陈述可选更新（低）。
