@@ -8,15 +8,20 @@
 | [`rules/frontend.md`](rules/frontend.md) | 前端项目，在 base 上追加 |
 | [`rules/monorepo.md`](rules/monorepo.md) | 多包仓库/多人协作，在 base 上追加 |
 
-## 用法一：复制这段给 agent（推荐）
+## 用法：复制这段给 agent
 
-在目标项目里打开编码 agent，把下面整段贴进去；把 `<RULES_DIR>` 换成本仓库的绝对路径（如 `/home/leihaohao/workspace/agent-rules`）。新旧项目都适用。
+在目标项目里打开编码 agent（Claude Code / Codex / DSH 等），把下面整段贴进去。新旧项目都适用。
 
 ```
-把 <RULES_DIR>/rules/ 下的规则并入本项目的规则文件：优先写进项目已有的 AGENTS.md 或 CLAUDE.md（两者都有就合并进 AGENTS.md）；没有就新建 AGENTS.md。
+把下面文件里的规则并入本项目的规则文件：
+- /home/leihaohao/workspace/agent-rules/rules/base.md（通用，必读）
+- /home/leihaohao/workspace/agent-rules/rules/frontend.md（前端项目再读）
+- /home/leihaohao/workspace/agent-rules/rules/monorepo.md（多包仓库再读）
+
+写进项目已有的 AGENTS.md 或 CLAUDE.md（两者都有就合并进 AGENTS.md）；没有就新建 AGENTS.md。
 
 步骤与要求：
-1. 读 <RULES_DIR>/rules/base.md；前端项目再读 frontend.md；多包仓库再读 monorepo.md。
+1. 先读完上面适用的文件，再动手。
 2. 读本项目现有的规则文件、项目结构与验证命令。
 3. 逐条并入，遵守三条边界：
    - 已有规则与本规则冲突或语义重叠 → 跳过该条，保留项目现状；
@@ -26,9 +31,7 @@
 5. 汇报（≤8 行）：新增了哪些；跳过哪些及原因（冲突/重叠/项目已有更具体的版本）；本项目实际使用的验证命令。
 ```
 
-## 用法二：手动并入
-
-把 `rules/base.md`（加上对应场景文件）的内容复制进项目已有的 `AGENTS.md` 或 `CLAUDE.md`（两者都有就并进 `AGENTS.md`；都没有就新建 `AGENTS.md`）；已有内容按上面的三条边界处理。
+> 仓库路径是 `/home/leihaohao/workspace/agent-rules`；如果以后换了位置，把提示词里的路径前缀一并替换。
 
 ## 维护
 
