@@ -13,15 +13,15 @@
 在目标项目里打开编码 agent（Claude Code / Codex / DSH 等），把下面整段贴进去。新旧项目都适用。
 
 ```
-把下面文件里的规则并入本项目的规则文件：
-- /home/leihaohao/workspace/agent-rules/rules/base.md（通用，必读）
-- /home/leihaohao/workspace/agent-rules/rules/frontend.md（前端项目再读）
-- /home/leihaohao/workspace/agent-rules/rules/monorepo.md（多包仓库再读）
+先把下面三个链接的内容读出来（raw 链接，用 web_fetch 或 curl 读取），再把其中的规则并入本项目的规则文件：
+- https://raw.githubusercontent.com/l246804/agent-rules/dev/rules/base.md （通用，必读）
+- https://raw.githubusercontent.com/l246804/agent-rules/dev/rules/frontend.md （前端项目再读）
+- https://raw.githubusercontent.com/l246804/agent-rules/dev/rules/monorepo.md （多包仓库再读）
 
 写进项目已有的 AGENTS.md 或 CLAUDE.md（两者都有就合并进 AGENTS.md）；没有就新建 AGENTS.md。
 
 步骤与要求：
-1. 先读完上面适用的文件，再动手。
+1. 先读完上面适用的链接，再动手；读不到的链接要说明，不要凭猜。
 2. 读本项目现有的规则文件、项目结构与验证命令。
 3. 逐条并入，遵守三条边界：
    - 已有规则与本规则冲突或语义重叠 → 跳过该条，保留项目现状；
@@ -31,7 +31,7 @@
 5. 汇报（≤8 行）：新增了哪些；跳过哪些及原因（冲突/重叠/项目已有更具体的版本）；本项目实际使用的验证命令。
 ```
 
-> 仓库路径是 `/home/leihaohao/workspace/agent-rules`；如果以后换了位置，把提示词里的路径前缀一并替换。
+> 仓库地址：<https://github.com/l246804/agent-rules>（当前分支 `dev`，链接里也是 `dev`；分支改名时把链接中的 `dev` 一并替换）。
 
 ## 维护
 
