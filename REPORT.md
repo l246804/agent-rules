@@ -4,7 +4,7 @@
 > 方法：4 个分析 teammate 分别产出 `findings/01–04`，Lead 融合为 `AGENTS.merged.md`，再由独立 verifier 对抗性核验（见 §10）。
 > 本报告所有条款均可回溯到 `findings/*` 中的 `path:line`；未引入四源之外的新规则。
 >
-> **结构变更（收尾）**：规则已按场景拆分到 [`rules/`](rules/)（`base.md` 通用、`frontend.md`、`monorepo.md`），规则文本去除了来源标签并泛化为与框架/依赖无关的表述。因此 `AGENTS.merged.md`、`examples/`、`tailor/`、`tools/` 已删除；本报告与 `findings/` 保留为分析溯源（含 v0.1 49 条、v0.2 48 条的核验记录）。v0.2 的逐条文本可在本仓库首次提交 `ce8ef7c` 中查看；`.refs/` 恢复命令在 [`AGENTS.md`](AGENTS.md) 的「复核溯源」一节。溯源中的 **S** 来源已去标识：`findings/04-storage-online.md` 更名为 [`findings/04-experience.md`](findings/04-experience.md)，全仓不再出现该项目的名称与路径。
+> **结构变更（收尾）**：规则已按场景拆分到 [`rules/`](rules/)（`base.md` 通用、`frontend.md`、`monorepo.md`），规则文本去除了来源标签并泛化为与框架/依赖无关的表述。因此 `AGENTS.merged.md`、`examples/`、`tailor/`、`tools/` 已删除；本报告与 `findings/` 保留为分析溯源（含 v0.1 49 条、v0.2 48 条的核验记录）。v0.2 的逐条文本可在本仓库首次提交 `ce8ef7c` 中查看；`.refs/` 恢复命令在 [`AGENTS.md`](AGENTS.md) 的「复核溯源」一节。溯源中的 **S** 来源已去标识：[`findings/04-experience.md`](findings/04-experience.md)（原文件名带项目名，已更名并清洗内容），当前工作树不再出现该项目的名称与路径。
 
 ---
 
