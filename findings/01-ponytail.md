@@ -8,7 +8,7 @@
 
 | 项 | 值 | 出处 |
 |---|---|---|
-| 上游仓库 | `DietrichGebert/ponytail` | `P:package.json:14` |
+| 上游仓库 | `https://github.com/DietrichGebert/ponytail` | `P:package.json:14` |
 | 本地快照（只读） | `.refs/ponytail`，`--depth 1` 克隆，本次分析未写入、未跑 git 写命令 | — |
 | 提交 | `e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156` | `git rev-parse HEAD` |
 | 提交标题 | `chore: release v4.10.0 (#870)` | `git log -1` |
@@ -380,7 +380,7 @@ hook 的输出形状只有注入上下文，没有决策字段：`P:hooks/ponyta
 规则：对本文档**每一条** `- **[P-NN]**` 条目，取该行全部 `P:<path>:<line|a-b>`；紧随的每个 `> ` 行是一个引文片段（行内 `…` 再切分）。比对前两侧都做同一套归一化：`trim` → 去行首 `//`/`#`/`*`/`<!--`/`-->` → 收白（因此被引的跨行注释按散文连接）；引文两侧的包裹双引号在比对时剥掉。要求**每个片段**至少被**一个**被引区间包含。另做两项全量校验：全文每个 `P:` 引用都能解析到快照内真实存在的行；§3.2b 表里 9 行不变量的 `:45`–`:57` 逐行命中。
 
 ```js
-// S0: node /tmp/ponytail-audit.mjs findings/01-ponytail.md   （把本代码块存成该文件后运行）
+// S0: node $TMPDIR/ponytail-audit.mjs findings/01-ponytail.md   （把本代码块存成该文件后运行）
 import fs from 'node:fs';
 const root = '.refs/ponytail/', doc = fs.readFileSync(process.argv[2], 'utf8').split('\n');
 const ws = s => s.replace(/\s+/g, ' ').trim();

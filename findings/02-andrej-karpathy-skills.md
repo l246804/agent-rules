@@ -1,6 +1,6 @@
 # 02 · andrej-karpathy-skills 对 Claude Code 的改善指南（规则提取与取证）
 
-分析对象：只读快照 `.refs/andrej-karpathy-skills`（仓库根 `/home/leihaohao/workspace/agent-rules`）。本文是取证记录，不是使用说明；每节以可判定的完成判据收束。
+分析对象：只读快照 `.refs/andrej-karpathy-skills`（下文相对路径均以本仓库根目录为基准）。本文是取证记录，不是使用说明；每节以可判定的完成判据收束。
 
 ## §0 溯源与引用约定
 
@@ -253,8 +253,8 @@ README 的四个 blockquote 是**引述**（`From Andrej's post:` / `From Andrej
 
 ```python
 import re
-ROOT = '/home/leihaohao/workspace/agent-rules/.refs/andrej-karpathy-skills/'
-DOC  = '/home/leihaohao/workspace/agent-rules/findings/02-andrej-karpathy-skills.md'
+ROOT = '.refs/andrej-karpathy-skills/'
+DOC  = 'findings/02-andrej-karpathy-skills.md'
 norm = lambda s: re.sub(r'\s+', ' ', s).strip()
 cache, ok, fail = {}, 0, 0
 for line in open(DOC, encoding='utf-8'):

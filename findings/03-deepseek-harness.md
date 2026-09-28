@@ -2,9 +2,9 @@
 
 ## §0 溯源与阅读约定
 
-**快照。** 一手来源是本地仓库 `/home/leihaohao/workspace/deepseek-harness`，HEAD = `477b4f420553e8a52c2fbccc464d7561b239c443`，branch `master`。本次分析全程**只读**：未运行 `pnpm`/构建/`scripts/verify-*`/生成器，未触碰 `node_modules/`，未在该仓库执行任何 git 写命令。
+**快照。** 一手来源是公开仓库 <https://github.com/deepseek-ai/deepseek-harness>（下文 `$DSH` 指该仓库的本地只读克隆），HEAD = `477b4f420553e8a52c2fbccc464d7561b239c443`，branch `master`。本次分析全程**只读**：未运行 `pnpm`/构建/`scripts/verify-*`/生成器，未触碰 `node_modules/`，未在该仓库执行任何 git 写命令。
 
-**只读证据。** 分析开始时 `git -C /home/leihaohao/workspace/deepseek-harness status --short` 输出 **0 行**；分析结束时同一命令仍为 **0 行**（见 §8 收尾测量）。注意 `git status --short` 默认隐藏 ignored 文件：该工作树另有 653 条 ignored 条目（`--ignored=matching`），其中与本文相关的一条是 `.agents/skills/ask-matt/agents/openai.yaml`（见更正 1）。
+**只读证据。** 分析开始时 `git -C $DSH status --short` 输出 **0 行**；分析结束时同一命令仍为 **0 行**（见 §8 收尾测量）。注意 `git status --short` 默认隐藏 ignored 文件：该工作树另有 653 条 ignored 条目（`--ignored=matching`），其中与本文相关的一条是 `.agents/skills/ask-matt/agents/openai.yaml`（见更正 1）。
 
 **引用前缀。** 本文用 `H:<path>:<line>` 指该快照中从仓库根起的文件行；前缀 `H:` 只在此处定义一次。`path:line-line` 是行区间。每条逐字引文用 ASCII 双引号 `"…"`；`…` 表示省略（省略处用 `|` 分隔以便机检）。中文括注用 `“”`，英文原文里的撇号与引号按源文件原样保留。
 
@@ -405,7 +405,7 @@ PR 主门禁是 `ci.yml`（726 行、11 个 job；20 个 workflow 见下）；ma
 
 ③④⑤ 的核心句逐字：③ `H:docs/AGENTS.md:54` "**Relocate** content that belongs in another tier; leave a one-line link if needed."、`H:docs/AGENTS.md:55` "**Condense** content that belongs here but can be shorter."、`H:docs/AGENTS.md:56` "**Raise** the ceiling only when the words need the space; justify the manifest diff in the PR. A too-low ceiling is a budget bug."。④ `H:AGENTS.md:178` "`CLAUDE.md` symlinks `AGENTS.md` at root and `packages/`; edit the real file."。⑤ `H:packages/sandbox/sandbox/src/escalation.ts:96` 的 "The narrowest wider sandbox mode for a one-shot retry of the exact ${subject} the sandbox just denied"。
 
-**④ 的补充：软链事实的实测证据与含义。** `ls -l /home/leihaohao/workspace/deepseek-harness/CLAUDE.md` 输出 `CLAUDE.md -> AGENTS.md`（符号链接，9 字节目标），而 `AGENTS.md` 是 17805 字节的普通文件（`-rw-rw-r--`）。含义三条：（1）**只有一个真源**——编辑 `CLAUDE.md` 就是编辑 `AGENTS.md`，不存在“两份要同步的指令文件”；（2）**这也是产品行为**：指令链默认把两个名字都当候选（C1，`config.ts:12`），内容级去重会把软链解析出的同一内容折叠成一次渲染（`README.md:217`），所以在**这个仓库**里 `CLAUDE.md` 既不会重复注入也不会漂移；（3）**反例被显式排除**：若 `CLAUDE.md` 是内容已漂移的独立副本，两者会**同时全量加载**——这正是 `verify-md-wrap` 要对软链指令文件去重的原因（`H:scripts/verify-md-wrap.ts:4` "The checker never rewrites; symlinked instruction"）。
+**④ 的补充：软链事实的实测证据与含义。** `ls -l $DSH/CLAUDE.md` 输出 `CLAUDE.md -> AGENTS.md`（符号链接，9 字节目标），而 `AGENTS.md` 是 17805 字节的普通文件（`-rw-rw-r--`）。含义三条：（1）**只有一个真源**——编辑 `CLAUDE.md` 就是编辑 `AGENTS.md`，不存在“两份要同步的指令文件”；（2）**这也是产品行为**：指令链默认把两个名字都当候选（C1，`config.ts:12`），内容级去重会把软链解析出的同一内容折叠成一次渲染（`README.md:217`），所以在**这个仓库**里 `CLAUDE.md` 既不会重复注入也不会漂移；（3）**反例被显式排除**：若 `CLAUDE.md` 是内容已漂移的独立副本，两者会**同时全量加载**——这正是 `verify-md-wrap` 要对软链指令文件去重的原因（`H:scripts/verify-md-wrap.ts:4` "The checker never rewrites; symlinked instruction"）。
 
 ### 前轮数字更正（每条附重测命令）
 
@@ -415,7 +415,7 @@ PR 主门禁是 `ci.yml`（726 行、11 个 job；20 个 workflow 见下）；ma
 - `git -C … ls-files '*.agents/skills/*/SKILL.md' | wc -l` → **15**：git pathspec 的 `*` 会跨越 `/`，多出的第 15 个是 `packages/experimental/webworker-runtime/tests/fixtures/vfs-example/workspace/.agents/skills/preview-tour/SKILL.md`，属于夹具，**不在** `.agents/skills/` 下。
 - 文件系统 `.agents/skills/` 确有 **15** 个目录，缺 `SKILL.md` 的是 `ask-matt/`，它只含 `agents/openai.yaml`，被 `H:.agents/skills/.gitignore:1` 的 `*/agents/openai.yaml` 忽略，所以 `ask-matt/` 完全未跟踪（`git -C … ls-files .agents/skills/ask-matt` → 0 行）。
 - 结论：brief 的“技能目录 15 个但其中 1 个无 SKILL.md”在**文件系统**口径下成立；但同一句指定的 `git ls-files` 命令给出 **14**，要拿到 15 必须用会把夹具算进来的宽松 pathspec。本文 A3 采 **14**（被跟踪、真正参与产品加载的技能）。旁证：快照里全部 `SKILL.md`（含夹具、preset、skill-office 资产、其他 snapshot）共 **24** 个，说明“按文件名数 SKILL.md”本身是个容易混淆的口径。
-- 重测：`git -C /home/leihaohao/workspace/deepseek-harness ls-files '.agents/skills/*/SKILL.md' | wc -l`；`git -C … ls-files '*.agents/skills/*/SKILL.md' | wc -l`；`ls -1 <repo>/.agents/skills/ | wc -l`；`git -C … ls-files | grep -c 'SKILL\.md$'`。
+- 重测：`git -C $DSH ls-files '.agents/skills/*/SKILL.md' | wc -l`；`git -C … ls-files '*.agents/skills/*/SKILL.md' | wc -l`；`ls -1 <repo>/.agents/skills/ | wc -l`；`git -C … ls-files | grep -c 'SKILL\.md$'`。
 
 **更正 2 — `scripts/` 规模：`267` 不可复现；以下为分口径实测值。**
 
@@ -500,7 +500,7 @@ PR 主门禁是 `ci.yml`（726 行、11 个 job；20 个 workflow 见下）；ma
 **结果：325 个带同行 H: 锚点的源引文段全部命中，0 个 FAIL；全文另有 12 段 ASCII 引号字符串不属源引文（2 段 node -e 证据命令、4 段锚点在前文/交叉引用、5 段 §8 修正记录自引、1 段方法说明词），不计入。** 扫描脚本与输出（脚本一次性内联执行，不在任何仓库落盘）：
 
 ```sh
-$ python3 - /home/leihaohao/workspace/deepseek-harness <<'PY'
+$ python3 - $DSH <<'PY'
 # 读取 findings/03-deepseek-harness.md，逐行按 tok 正则取 H:<path>:<line> 与 "引文"；
 # 引文与最近的**前置** H: 引用配对（本文的行文格式即“引用在前、引文在后”）；
 # 引文按 … 分段，逐段要求 norm(frag) 是 norm(rendered(citedRange)) 的子串。
@@ -514,7 +514,7 @@ inline quotes total: 337   anchored (same-line H:): 325   unanchored: 12
 
 **修正记录（自审发现的真实错误，均已改）。** ① 引文被拆行导致的行号偏差：`docs/AGENTS.md` 的 "Standing orders" 在 21 行（原写 17）、slop checklist 两条在 64 与 72 行（原合并为 62）、`verify-type-equiv.ts` 与 `verify-translation-pairing.ts` 的 doc 注释跨 2–3 行、`verify-client-domain-graph.ts` 跨 2–3 行且原文含转义反斜杠 `*\/src/`、`config.ts` 的 `maxSourceBytes` 语义在 25 行（原写 14）、`types.ts` 的 bump 规则跨 79–85 行、`@returns` 在 169 行（原写 170）、`escalation.ts` 的 hint JSDoc 在 76–79 行（原写 84）、`lefthook.yml` 开场注释跨 1–2 行、`repeat-tool-reminder` 的引文实际跨 2–3 / 28–30 / 43–46 / 71–74 / 82–85 行、`timeout-policy` 跨 2–4 行、5 个 `SKILL.md` 首段在 8 行（原写 9）、`verify-doc-budgets.ts` 的三条规则在 3–6 行、`verify-default-product-isolation.ts` 的 doc 注释在 2 行（原写 1）、`known-event-types.ts` 的投影白名单 JSDoc 在 84 行（原写 85）、`verify-md-wrap.ts` 的 "The checker never rewrites" 在 4 行（原写 5）。② **真实内容错误**（不是行号问题，全部由本次自审抓出）：`escalation.ts:96` 的引文漏了 "sandbox" 一词（原文是 "The narrowest wider **sandbox** mode …"）；`packages/client/AGENTS.md` 的 web 层条目引文内含 ASCII 双引号导致与本文的引文定界符冲突，改为引用不含内部引号的两段；`verify-doc-budgets.ts` 与 `repeat-tool-reminder` 的两条引文跨到以反引号开头的续行，改为在行边界处断开。③ **A1.06 的原始数字是错的**：初稿写 "44 条脚本中 41 条与文档一致，3 条只在 manifest 侧出现"，实测是 `package.json` 184 个 scripts、`AGENTS.md` 的 `## Commands` 段提及 18 个且全部存在，已改写为该实测结论。
 
-**计数重测。** 文档里每个数字都由下列命令在 `/home/leihaohao/workspace/deepseek-harness` 下重测：
+**计数重测。** 文档里每个数字都由下列命令在 `$DSH` 下重测：
 
 | 数字 | 命令 | 实测 |
 |---|---|---|
@@ -542,7 +542,7 @@ inline quotes total: 337   anchored (same-line H:): 325   unanchored: 12
 
 **长度披露。** 本文 **598 行**，超出任务书 300–500 行的期望。超出部分是覆盖驱动的、未发现注水段落：161 条 A 层条目每条都必须自带 `H:` 与强制形式 token（约占 200 行），§5 覆盖表要求含实测行数，§8 要求把自审命令与结果落盘，末尾的 δ 修正记录是 `task-7` 明确要求的追加小节（含复跑命令与输出，约 50 行）。若必须压回 500 行以内，唯一不损失覆盖的办法是把 §5 的两张表与 §8 的计数表改成纯文本列举（会降低可审计性）。
 
-**只读收尾。** 分析结束后 `git -C /home/leihaohao/workspace/deepseek-harness status --short` 输出 **0 行**，与开始时一致；本次分析全程未在该仓库写任何文件、未执行任何 git 写命令、未运行 `pnpm`/构建/`scripts/verify-*`/生成器、未触碰 `node_modules/`。**本文档是本次任务唯一写入的文件。**
+**只读收尾。** 分析结束后 `git -C $DSH status --short` 输出 **0 行**，与开始时一致；本次分析全程未在该仓库写任何文件、未执行任何 git 写命令、未运行 `pnpm`/构建/`scripts/verify-*`/生成器、未触碰 `node_modules/`。**本文档是本次任务唯一写入的文件。**
 
 **未覆盖/未验证项（诚实声明）。** ① 68 个 `verify-*` 脚本只读了每个的文档注释与代表行的报错文本（用于 B1 归并与出处），未逐个通读实现；B1 的“它拦什么”描述来自各脚本自身的 `@module`/首段注释，不是逆向推断。② CI 的 job 依赖图、`allowFailure` 的具体标记集合、`gatesForMode` 的完整 mode→gate 映射未逐个核对（`run-gates.ts` 共 1660 行，只取证了 skip 语义与汇总）。③ `vendor/` 按提示单独标注为内置上游副本，其内部规则未逐条分析（只处理 `vendor/AGENTS.md`）。④ 20 个 workflow 中 19 个只列名与主题，未逐个提取 run 命令。⑤ 覆盖率豁免清单只抽样引用，未逐条判断合理性。⑥ 32 个 `.zh.md` 双语 counterpart 未纳入范围（本文只分析英文侧与规则面）。
 
@@ -555,7 +555,7 @@ inline quotes total: 337   anchored (same-line H:): 325   unanchored: 12
 **δ1 — B1 的 spec / 非 spec 拆分（原 `:245`，最严重）。** 改前：`顶层匹配 **68** 个，其中 **34** 个是 *.spec.ts（脚本自带测试、本身也是 test lane 的一部分），**34** 个是被测脚本`；改后：`顶层匹配 **68** 个，其中 **27** 个是 *.spec.ts（脚本自带测试、本身也是 test lane 的一部分），**41** 个是被测脚本（68 = 27 + 41）`。同一处修正同步落到 §5 覆盖表（`含 34 个 .spec.ts` → `含 27 个 .spec.ts`）。复跑：
 
 ```sh
-$ cd /home/leihaohao/workspace/deepseek-harness
+$ cd $DSH
 $ git ls-files 'scripts/verify-*.ts' | grep -c '\.spec\.ts$'
 27
 $ git ls-files 'scripts/verify-*.ts' | grep -vc '\.spec\.ts$'

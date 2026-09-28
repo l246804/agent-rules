@@ -235,10 +235,10 @@
 3. **未跑重复度扫描**：`05-merge-plan.md:88` 要求写入后做跨文件重复语句扫描（阈值 0.55）。本包新增的 R-01 语句首半句（「默认按最小实现与'命中即停'执行」）与 `base` 内 `P-16`（`01-ponytail.md:173`）、`P-17`（`:181`）同主题，是否触发阈值需写入阶段实跑；本轮未做相似度计算。
 4. **「可判『做到没有』」为定性判断**：31 条均给出可检验动作；「实质风险」「昂贵测试」「需要长期留存」等限定词沿用裁决/台账原文，未新增模糊度，但无法机械证明。
 5. **未改任何文件**：本轮唯一写入是本报告；改写包、三份台账、`04`/`05` 均未改（`git status` 可复核）。
-6. **复跑脚本（§0/§1 的解析与计数）**：
+6. **复跑脚本（§0/§1 的解析与计数），在仓库根执行**：
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re
 from pathlib import Path
 def idx(path, end):
@@ -266,7 +266,7 @@ PY
 复跑命令（读改写包并对每条 F 的关键片段做包含性断言）：
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules/review && python3 - <<'PY'
+cd review && python3 - <<'PY'
 import re
 from pathlib import Path
 p = Path('06-rewrite-pack.md').read_text(encoding='utf-8')
@@ -324,7 +324,7 @@ PY
 - 复跑（解析台账标签与包内归属）：
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules/review && python3 - <<'PY'
+cd review && python3 - <<'PY'
 import re
 from collections import Counter
 from pathlib import Path
@@ -389,7 +389,7 @@ final: {'base': 68, 'gates': 33, 'docs': 33, 'frontend': 17, 'agent-cfg': 15, 'm
 ### 4.5 写纪律
 
 ```
-$ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=all
+$ git status --short --untracked-files=all
 ?? findings/{01-ponytail,02-andrej-karpathy-skills,03-deepseek-harness,99-verification}.md
 ?? review/{00-schema,01-ponytail,02-andrej-karpathy-skills,03-deepseek-harness,04-adjudications,05-merge-plan,06-rewrite-pack,07-rewrite-audit}.md
 $ ls -d rules      → 不存在 ✓（未建 `rules/`）

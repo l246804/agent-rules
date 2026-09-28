@@ -1,7 +1,7 @@
 # 99 — 三篇 findings 的独立对抗性核验（verifier 视角）
 
 > 核验者：`citation-verifier`（fresh 上下文，不继承 Lead/分析者的推理）。本文是唯一被核验者允许写入的文件；三篇被核验文档**一字未改**（§0.1 与 §1.6 的 sha256/git status 一致即为证据）。
-> 引用被核验文档用 `文件名:行号`；引用一手快照用 `源码:path:line`。所有命令在 `/home/leihaohao/workspace/agent-rules` 下可直接粘贴复跑（附录 A 的脚本存为 `/tmp/va.py`）。
+> 引用被核验文档用 `文件名:行号`；引用一手快照用 `源码:path:line`（`$DSH` 指公开仓库 <https://github.com/deepseek-ai/deepseek-harness> 的本地只读克隆）。所有命令在本仓库根目录下可直接粘贴复跑（附录 A 的脚本存为 `$TMPDIR/va.py`）。
 > 全程只读：未运行快照的 `pnpm`/构建/`scripts/verify-*`/生成器，未碰 `node_modules`，未执行任何 git 写命令。
 
 ## §0 结论摘要
@@ -25,7 +25,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | `findings/02-andrej-karpathy-skills.md` | `daae5520…7782` | 同 | 373 / 373 | **一致** |
 | `findings/03-deepseek-harness.md` | `54cfa137…2ea3` | 同 | 544 / 544 | **一致** |
 
-审计对象冻结成立：3/3 sha256 与行数逐字相符，**无致命项**。三个一手快照 HEAD 亦未漂移：`.refs/ponytail` = `e3ba2aa6…56156`（porcelain 0 行）、`.refs/andrej-karpathy-skills` = `2c606141…b9c2`（porcelain 0 行）、`/home/leihaohao/workspace/deepseek-harness` = `477b4f42…c443`（`status --short` 0 行）。
+审计对象冻结成立：3/3 sha256 与行数逐字相符，**无致命项**。三个一手快照 HEAD 亦未漂移：`.refs/ponytail` = `e3ba2aa6…56156`（porcelain 0 行）、`.refs/andrej-karpathy-skills` = `2c606141…b9c2`（porcelain 0 行）、`$DSH` = `477b4f42…c443`（`status --short` 0 行）。
 
 ### 0.2 每篇裁定
 
@@ -73,7 +73,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | 计数与规模断言 | 三篇全部数字 | 逐条见 1.1–1.3；共 **8** 条不成立 |
 | 定种随机抽样 | 每篇 8 条，seed `20260927` | 24/24 深核通过（1.5） |
 
-命令：`python3 /tmp/va.py`（附录 A 全文）。**注：§1 的全部数字是第 1 版文档（§0.1 冻结值）的第一轮实测；修正后（新 sha256）的回归数字见 §4.4。**
+命令：`python3 $TMPDIR/va.py`（附录 A 全文）。**注：§1 的全部数字是第 1 版文档（§0.1 冻结值）的第一轮实测；修正后（新 sha256）的回归数字见 §4.4。**
 
 ### 1.1 `01-ponytail.md`（P 前缀，快照 `.refs/ponytail` @ `e3ba2aa6`）
 
@@ -83,7 +83,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | V01-02 | §5 各文件行数（skills 6：120/57/41/44/50/71；hooks 6 js：115/169/98/155/144/77；4 json：41/21/17/26；statusline 18/24；docs 49/196/211；scripts 76/78；workflows 36/24；benchmarks 108） | `wc -l` 逐文件（见附录 B.1） | 全部一致 | PASS |
 | V01-03 | 7 份投影行数 36/30/30/30/30/30/35；`commands/*.toml` 2×6；`.opencode/command/*.md` 5×6；`.openclaw/skills/*` {108,52,47,41,37,70}；pi/mcp/py 211 / 217+21 / 26+52；scripts 四件 60/135/77/75（合 347）；tests 16 个合 2070 | `wc -l` 逐文件 | 全部一致（`.openclaw` 为同一多重集，合 355） | PASS |
 | V01-04 | `examples/*.md`（11 个示例）行数 `71+211+31+156+35+58+62+37+272+390+41`；`examples/README.md` 17 | `ls examples/*.md \| wc -l`（→12）；`wc -l examples/*.md` | 12 个 = `README.md` 17 + 11 个示例（与文档列表一致） | PASS |
-| V01-05 | 63 条规则、110 引用、78 片段、0 miss（§7.1 S0） | `python3 /tmp/va.py` | `items=63 citations=110 fragments=78 miss=0` | PASS |
+| V01-05 | 63 条规则、110 引用、78 片段、0 miss（§7.1 S0） | `python3 $TMPDIR/va.py` | `items=63 citations=110 fragments=78 miss=0` | PASS |
 | V01-06 | 7/7 投影与 canonical 逐字节相等（§3.2a/§4/S4） | 重实现 `check-rule-copies.js` 的 canonical 与 7 个 normalizer（附录 B.2；**未执行快照脚本**，约束见 §3） | `copies listed: 7`，7/7 `MATCH` | PASS |
 | V01-07 | canonical/各副本「**2491 字节**」（`:243`、`:281`、`:441`） | `python3 -c` 计算 canonical 的 `len()` 与 UTF-8 字节数（附录 B.2） | **2491 字符 / 2494 UTF-8 字节**（差异 = `—`(U+2014) +2B、`²`(U+00B2) +1B） | **FAIL（LOW）**：单位写错，数字是字符数 |
 | V01-08 | 9 条不变量（`:44-58`）且同时存在于 SKILL.md 与 AGENTS.md；成功输出行 | 重实现（附录 B.2）；`sed -n '76p' scripts/check-rule-copies.js` | 9 条全命中；`76` 行为 `` console.log(`Rule copies match AGENTS.md; ${INVARIANTS.length} …`) `` → 9 | PASS |
@@ -108,7 +108,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | V02-03 | skill 静默缺 `CLAUDE.md:62-65`；skill 反向多来源链接；`.mdc:2` 与 `SKILL.md:3` 描述逐字相同 | `grep -n 'These guidelines are working if' CLAUDE.md .mdc SKILL.md`；`sed -n '9p' SKILL.md`；`diff <(sed -n '3p' SKILL.md) <(sed -n '2p' .mdc)` | 仅 `CLAUDE.md:65`+`.mdc:70`；`SKILL.md:9` 含 x.com 链接；desc diff 空 | PASS |
 | V02-04 | 9 个跟踪文件、全 `100644`、无 `AGENTS.md`、零 hook/脚本/测试 | `git ls-files`；`git ls-files -s \| awk '{print $1}' \| sort \| uniq -c`；`grep -rn -E 'hooks\|PostToolUse\|PreToolUse\|settings\.json' . --exclude-dir=.git \| wc -l` | 9 / 9×100644 / 0 命中 / 0 命中 | PASS |
 | V02-05 | 无 `LICENSE`，但有 4 处 MIT 声明（`plugin.json:8`、`SKILL.md:4`、`README.md:171`、`README.zh.md:171`） | `ls -a`；`grep -rn 'MIT' . --exclude-dir=.git` | 无 LICENSE；恰 4 处，路径相符 | PASS |
-| V02-06 | 计数 4/18/9/5/32（算术 9+18+5=32）；50 行引文 OK=50 | `grep -c '^## [0-9]\.' CLAUDE.md`；`grep -c '^- ' CLAUDE.md`；`sed -n '9p;19p;31p;47p' CLAUDE.md \| grep -o '\.' \| wc -l`；`grep -cE '^\| R[0-9]+ \|' findings/02-…md`；`python3 /tmp/va.py` | 4 / 18 / 9 / 32；OK=50 FAIL=0 | PASS |
+| V02-06 | 计数 4/18/9/5/32（算术 9+18+5=32）；50 行引文 OK=50 | `grep -c '^## [0-9]\.' CLAUDE.md`；`grep -c '^- ' CLAUDE.md`；`sed -n '9p;19p;31p;47p' CLAUDE.md \| grep -o '\.' \| wc -l`；`grep -cE '^\| R[0-9]+ \|' findings/02-…md`；`python3 $TMPDIR/va.py` | 4 / 18 / 9 / 32；OK=50 FAIL=0 | PASS |
 | V02-07 | `EXAMPLES.md` 522 行、14838 字节、322 行在围栏内（61.7%）、36 围栏行=18 块（9 python/4 diff/5 无语言）、9 `### Example`、9 对 ❌/✅、6 节、零入站引用 | `wc -l`；`wc -c`；围栏内行数脚本；`grep -c` 各项；`grep -rn EXAMPLES . --exclude-dir=.git \| wc -l` | 522 / 14838 / 322 / 36=9+4+5 / 9 / 9 / 6 / 0 | PASS |
 | V02-08 | **T**：C9「反向张力」成立（原帖抱怨不清理死代码 vs R23 禁止删既有死代码） | `sed -n '40p;41p' CLAUDE.md`；`sed -n '17p' README.md` | `CLAUDE.md:41` = 「Don't remove pre-existing dead code unless asked.」；README.md:17 = 「don't clean up dead code...」 | PASS |
 | V02-09 | README/README.zh 行平行：171/171、16 个标题行号一致、围栏位置一致、字节相同行 83（空 62 + 非空 21） | ``wc -l``；``grep -n '^#'`` 对比；``grep -n '^```'`` 对比；python 逐行 zip（**排除 split 产生的尾部空元素**） | 171/171；行号 `1 11 …169` 相同；围栏行全同；83 = 62+21，非空 21 项与文档枚举（9+2+1+2+1+1+2+2+1）逐项相符 | PASS |
@@ -120,7 +120,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | V02-15 | 原帖 4 段引述（Q1–Q4）与 4 条未引句（O1–O4）的逐字性 | 一手快照内**无** x.com 原文；未联网抓取 | 文档 `:166`、`:238` 自述「核验强度止于片段在该 URL 页面正文中」 | UNVERIFIED（外部来源，超出核验者一手范围） |
 | V02-16 | 两条 URL 的 301 / `ls-remote` 结果 | 需联网 | `:12-18` 与 `:125` 的叙述未复跑 | UNVERIFIED（未联网） |
 
-### 1.3 `03-deepseek-harness.md`（H 前缀，快照 `/home/leihaohao/workspace/deepseek-harness` @ `477b4f42`）
+### 1.3 `03-deepseek-harness.md`（H 前缀，快照 `$DSH` @ `477b4f42`）
 
 | ID | 断言 | 方法 | 证据 | 结论 |
 |---|---|---|---|---|
@@ -146,7 +146,7 @@ $ wc -l findings/0{1,2,3}-*.md
 | V03-20 | C4：`SESSION_FORMAT_VERSION = 4`、required-on-read、59 事件类型、`surface.ts:312`、`index.ts:231`、状态文档 | `sed -n` 逐行；`python3` 数 `known-event-types.ts:23-81` 条目 | 全部相符；事件条目 59 | PASS |
 | V03-21 | C5：38 个 `invariant.ts` companion；`agent-loop/src/invariant.ts` 的安装/断言行；`architecture.md:125`、session README `:88` | `git ls-files 'packages/*/*/src/invariant.ts' \| wc -l`；`sed -n` 逐行 | 38；`:2/:16/:19/:21-23/:34/:38/:42` 全部相符 | PASS |
 | V03-22 | 定种抽样 8 条：A1.19/1.20/1.31/2.07/2.26/2.49/2.70/2.72 | 逐条打开源文件（§1.5） | 8/8 相符（含 `AGENTS.md:132/133/144`、`packages/client/AGENTS.md:25`、`snapshots/AGENTS.md:5`、`scripts/AGENTS.md:3`） | PASS |
-| V03-23 | §8（`:500`/`:507`/`:535`）「325 个引文段全部命中，0 个 FAIL」 | `python3 /tmp/va.py` | 我抽 **337** 段；**325** 段命中同行锚点（与 325 吻合），**12** 段未命中且全部为：2 段 `node -e` 命令串（`:453`/`:457`）、4 段锚点在前文（`:451`/`:477`×2 → `docs/AGENTS.md:58`；`:492` → `scripts/AGENTS.md:3`，内容均已逐字验证存在）、5 段 §8 修正记录自引（`:512`）、1 段方法说明词（`:504`）。无伪造引文 | **FAIL（LOW，口径）**：数字与命中结论成立，但「引文段」范围未定义，须写明 |
+| V03-23 | §8（`:500`/`:507`/`:535`）「325 个引文段全部命中，0 个 FAIL」 | `python3 $TMPDIR/va.py` | 我抽 **337** 段；**325** 段命中同行锚点（与 325 吻合），**12** 段未命中且全部为：2 段 `node -e` 命令串（`:453`/`:457`）、4 段锚点在前文（`:451`/`:477`×2 → `docs/AGENTS.md:58`；`:492` → `scripts/AGENTS.md:3`，内容均已逐字验证存在）、5 段 §8 修正记录自引（`:512`）、1 段方法说明词（`:504`）。无伪造引文 | **FAIL（LOW，口径）**：数字与命中结论成立，但「引文段」范围未定义，须写明 |
 | V03-24 | G1–G10 缺口（含 G9「4 个条目余量 <1%」、G3「pre-push 只有 typecheck」、G8「ask-matt 无 gate」） | 由 V03-05…V03-14 的数据重算 | 4 个 <1%：AGENTS 0.05%、docs/AGENTS 0.53%、cordis-primer 0.00%、testing 0.15% → 与 G9 的 4 条相符 | PASS |
 | V03-25 | 68 个 `verify-*`、18 个生成器、vitest/CI 的实际运行 | 未执行（约束 §3） | 仅重实现/逐行读源码 | UNVERIFIED（运行结果未复跑） |
 
@@ -191,14 +191,14 @@ PY
 ### 1.6 写纪律与交叉一致性
 
 ```
-$ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=all
+$ git status --short --untracked-files=all
 ?? findings/01-ponytail.md
 ?? findings/02-andrej-karpathy-skills.md
 ?? findings/03-deepseek-harness.md
 （本文件写入后应为第 4 行 ?? findings/99-verification.md）
 $ git -C .refs/ponytail status --porcelain | wc -l          # 0
 $ git -C .refs/andrej-karpathy-skills status --porcelain | wc -l   # 0
-$ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l   # 0
+$ git -C $DSH status --short | wc -l   # 0
 ```
 
 - `findings/` 为未跟踪目录（`.gitignore` 只忽略 `.refs/`），核验前 3 个文件、核验后 4 个文件，**无第 5 个文件**、无对既有文件的改动 → 写纪律 **PASS**。
@@ -231,11 +231,11 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l   # 0
 1. **`:245`（B1）与 `:375`（§5）的 spec 拆分**：
    - `:245` `…顶层匹配 **68** 个，其中 **34** 个是 \`*.spec.ts\`（脚本自带测试、本身也是 \`test\` lane 的一部分），**34** 个是被测脚本。` → `…顶层匹配 **68** 个，其中 **27** 个是 \`*.spec.ts\`（脚本自带测试、本身也是 \`test\` lane 的一部分），**41** 个是被测脚本（68 = 27 + 41）。`
    - `:375` `68 个顶层匹配（含 34 个 \`.spec.ts\`）` → `68 个顶层匹配（含 27 个 \`.spec.ts\`）`
-   复跑：`cd /home/leihaohao/workspace/deepseek-harness && git ls-files 'scripts/verify-*.ts' | grep -c '\.spec\.ts$'` → `27`；`git ls-files 'scripts/verify-*.ts' | grep -vc '\.spec\.ts$'` → `41`。
+   复跑：`cd $DSH && git ls-files 'scripts/verify-*.ts' | grep -c '\.spec\.ts$'` → `27`；`git ls-files 'scripts/verify-*.ts' | grep -vc '\.spec\.ts$'` → `41`。
 2. **`:277`（B7）与 `:381`（§5）的 job 数**：`ci.yml` 726 行、**11** 个 job（10 个 job + `all-checks-passed`；`node-compat` 为 3 元矩阵）；`20` 应仅用于 workflow 数。建议改为 `（726 行、11 个 job；20 个 workflow 见下）`。
-   复跑：`cd /home/leihaohao/workspace/deepseek-harness && grep -nE '^  [a-z0-9-]+:$' .github/workflows/ci.yml | grep -v pull_request | wc -l` → `11`
+   复跑：`cd $DSH && grep -nE '^  [a-z0-9-]+:$' .github/workflows/ci.yml | grep -v pull_request | wc -l` → `11`
 3. **`:500`/`:507`/`:535` 引文段口径**：`325 个引文段全部命中，0 个 FAIL` → `325 个带同行 H: 锚点的源引文段全部命中，0 个 FAIL；全文另有 12 段 ASCII 引号字符串不属源引文（2 段 node -e 证据命令、4 段锚点在前文/交叉引用、5 段 §8 修正记录自引、1 段方法说明词），不计入`。
-   复跑：`python3 /tmp/va.py`（末两行为 `doc03 inline quotes: fragments=337 not_contained_in_line_refs=12`；337−12=325）
+   复跑：`python3 $TMPDIR/va.py`（末两行为 `doc03 inline quotes: fragments=337 not_contained_in_line_refs=12`；337−12=325）
 
 ## §3 未能证实项与核验者局限
 
@@ -270,12 +270,12 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l   # 0
 |---|---|---|---|---|---|
 | 1 | `01:243`/`:281`/`:441` | 「2491 字节」→「2491 字符（UTF-8 2494 字节）」 | ✅ 三处均按 §2.1-1 改（`:243` 为「2491 字符（UTF-8 2494 字节）」、`:281`/`:441` 为「2491 字符 / 2494 UTF-8 字节」） | `cd .refs/ponytail && python3 -c "import re;s=open('AGENTS.md',encoding='utf-8').read().replace('\r\n','\n').strip();c=re.sub(r'\n\n\(Yes, this file also applies[\s\S]*?\)$','',s).strip();print(len(c),len(c.encode()))"` → `2491 2494` | ✅ |
 | 2 | `01:71`（P-09） | 第二锚点 `config.js:16-18` → `:79-81`（可加 `:91`） | ✅ 现为 `P:hooks/ponytail-config.js:79-81`、`P:hooks/ponytail-config.js:91` | `grep -n 'VALID_MODES\|RUNTIME_MODES\|valid default' .refs/ponytail/hooks/ponytail-config.js` → `:17` `VALID_MODES`（含 review）、`:79-81` 「never a valid default (#377)」、`:91` `RUNTIME_MODES.includes(...)` | ✅ |
-| 3 | `01:259` | 裸 `:60-69`/`:76` → 带 `P:` 前缀 | ✅ 现为 `P:scripts/check-rule-copies.js:60-69` 与 `P:scripts/check-rule-copies.js:76` | `python3 /tmp/va.py` → `01-ponytail.md: distinct_refs=131 bad=0`（无路径/行号不可解析项） | ✅ |
+| 3 | `01:259` | 裸 `:60-69`/`:76` → 带 `P:` 前缀 | ✅ 现为 `P:scripts/check-rule-copies.js:60-69` 与 `P:scripts/check-rule-copies.js:76` | `python3 $TMPDIR/va.py` → `01-ponytail.md: distinct_refs=131 bad=0`（无路径/行号不可解析项） | ✅ |
 | 4 | `02:235` | 「36 个围栏行」→「12 个围栏行（6 个代码块；9+2+1）」 | ✅ 逐字落地（围栏串改用双反引号包裹以避开本文件代码围栏，属必要等价替换） | `grep -c '^```' .refs/andrej-karpathy-skills/README.md .refs/andrej-karpathy-skills/README.zh.md` → `12` / `12`；`grep '^```' …/README.md \| sort \| uniq -c` → `9`、`2`、`1` | ✅ |
 | 5 | `02:198`（C7） | `grep -i api` 证据句改为 7 处并列出 | ✅ 逐字落地（含 `EXAMPLES.md:47,51,415`） | `grep -rn -i api .refs/andrej-karpathy-skills --exclude-dir=.git` → 7 行：`README.md:17`/`:159`、`README.zh.md:17`/`:159`、`EXAMPLES.md:47`/`:51`/`:415` | ✅ |
-| 6 | `03:245`/`:375` | verify-`*.ts` 拆分 34/34 → 27/41 | ✅ 逐字落地（含 `（68 = 27 + 41）`；§5 表同步 `含 27 个`） | `cd /home/leihaohao/workspace/deepseek-harness && git ls-files 'scripts/verify-*.ts' \| grep -c '\.spec\.ts$'` → `27`；`… \| grep -vc '\.spec\.ts$'` → `41`；`find scripts -maxdepth 1 -name 'verify-*.ts' -name '*.spec.ts' \| wc -l` → `27`（双仪器一致） | ✅ |
+| 6 | `03:245`/`:375` | verify-`*.ts` 拆分 34/34 → 27/41 | ✅ 逐字落地（含 `（68 = 27 + 41）`；§5 表同步 `含 27 个`） | `cd $DSH && git ls-files 'scripts/verify-*.ts' \| grep -c '\.spec\.ts$'` → `27`；`… \| grep -vc '\.spec\.ts$'` → `41`；`find scripts -maxdepth 1 -name 'verify-*.ts' -name '*.spec.ts' \| wc -l` → `27`（双仪器一致） | ✅ |
 | 7 | `03:277`/`:381` | `ci.yml`「20 个 job」→ 11 个 job（20 保留给 workflow） | ✅ 逐字落地（`:277` 为「726 行、11 个 job；20 个 workflow 见下」、`:381` 为「726 行 / 11 job」） | `grep -nE '^  [a-z0-9-]+:$' .github/workflows/ci.yml \| wc -l` → `11`（行号清单与 δ2 打印逐行相符）；`git ls-files '.github/workflows/*.yml' \| wc -l` → `20` | ✅ |
-| 8 | `03:500`/`:507`/`:535` | 「325 段 0 FAIL」补口径 | ✅ 逐字落地：`325 个带同行 H: 锚点的源引文段` + 12 段四类不计入；计数表与代码块同步 | `python3 /tmp/va.py` → `doc03 inline quotes: fragments=337 not_contained_in_line_refs=12`（337−12=325，与改前一致）；`sed -n '538p;541p' findings/03-deepseek-harness.md` → 325（337/12 注记）、598 行 | ✅ |
+| 8 | `03:500`/`:507`/`:535` | 「325 段 0 FAIL」补口径 | ✅ 逐字落地：`325 个带同行 H: 锚点的源引文段` + 12 段四类不计入；计数表与代码块同步 | `python3 $TMPDIR/va.py` → `doc03 inline quotes: fragments=337 not_contained_in_line_refs=12`（337−12=325，与改前一致）；`sed -n '538p;541p' findings/03-deepseek-harness.md` → 325（337/12 注记）、598 行 | ✅ |
 
 **闭环结论：8/8 全部逐字落地并复测通过。**
 
@@ -287,7 +287,7 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l   # 0
    - 新锚点语义复核：`01:71` 的 `:79-81`/`:91` 确为「review 不能作默认档」的判定处（`:17` 的 `VALID_MODES` 含 review，只在配置层生效，与该断言不矛盾）；`02:198` 新增的 `EXAMPLES.md:47,51,415` 三处确为 `api` 命中行。
 2. **δ 小节如实性**：三篇 δ 都注明了修正前版本/行号、替换前后文本、复跑命令与输出；我逐条复跑，输出与 δ 所述一致（含 `03` δ2 的 11 个 job 行号清单、δ3 的 337/325/12 三个数、`01` δ4 的 `citations=111`）。
 3. **文档自审脚本实跑**（提取文档内嵌代码块执行，只读）：
-   - `01` §7.1 的 S0 JS 块（`node /tmp/s0.mjs findings/01-ponytail.md`）→ `items=63 citations=111 quoted=63 fragments=78 invariants=9 miss=0`，exit 0。
+   - `01` §7.1 的 S0 JS 块（`node $TMPDIR/s0.mjs findings/01-ponytail.md`）→ `items=63 citations=111 quoted=63 fragments=78 invariants=9 miss=0`，exit 0。
    - `02` §8A 的 Python 块 → `quotes_checked=50 OK=50 FAIL=0`；`grep -cE '^\| F[0-9]+ \|'` → `9`；F 集合与 `git ls-files` 比对无输出；`wc -l/-c` = `400`/`42464`，末字节 `0a`（δ 已同步这些自指值）。
 4. **结构完整性**：三篇**无表格错位**（按未转义 `|` 计每个连续表格块的列数一致）；代码围栏配平（`01` 2 行 / `02` 20 行 / `03` 8 行）；文内 `§` 引用全部能对上标题（含新增 `§2.2`/`§2.3` 交叉引用）。
 5. **新发现 A（FAIL，LOW，本轮唯一未闭环项）**——`01-ponytail.md:430`（§7.1「实测结果」）仍写 `items=63 citations=110 …` 与「110 个可解析引用」，但修正把 P-09 的引用从 2 条增到 3 条，同一文件 δ.4（`:469`）已写 111，我实测也是 **111**（`node` 实跑其内嵌 S0 + 独立计数 `items=63 citations=111`）。这是修正**引入**的自审口径不一致（非原 §2 条目）。修法：`:430` 行两处 `110` → `111`（并在该行或 δ.4 注明 P-09 引用 2→3）。复跑：`sed -n '430p;469p' findings/01-ponytail.md` 与上面的 node 复跑。
@@ -313,14 +313,14 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l   # 0
 ### 4.5 写纪律
 
 ```
-$ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=all
+$ git status --short --untracked-files=all
 ?? findings/01-ponytail.md
 ?? findings/02-andrej-karpathy-skills.md
 ?? findings/03-deepseek-harness.md
 ?? findings/99-verification.md
 $ git -C .refs/ponytail status --porcelain | wc -l            # 0   HEAD=e3ba2aa6…56156（未变）
 $ git -C .refs/andrej-karpathy-skills status --porcelain | wc -l  # 0   HEAD=2c606141…b9c2（未变）
-$ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l  # 0   HEAD=477b4f42…c443（未变）
+$ git -C $DSH status --short | wc -l  # 0   HEAD=477b4f42…c443（未变）
 ```
 
 只有 `findings/` 下 4 个文件（三篇被核验文档 + 本报告），无第 5 个文件、无对既有文件的改动；三快照 HEAD 与 porcelain 均未变。**写纪律 PASS。**
@@ -367,8 +367,8 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l  # 0 
 |---|---|---|---|
 | 旧值 0 命中 | `grep -n '110' findings/01-ponytail.md \| wc -l` | `0` | ✅ |
 | `:430` 两处已改 | `sed -n '430p' findings/01-ponytail.md` | 该行为「实测结果：items=63 citations=111 quoted=63 fragments=78 invariants=9 miss=0，exit 0 —— 63 条规则、111 个可解析引用……」（两处均为 111） | ✅ |
-| 自审脚本复跑 | 提取 §7.1 的 **js 代码块** 为 `/tmp/s0b.mjs`，`node /tmp/s0b.mjs findings/01-ponytail.md` | `items=63 citations=111 quoted=63 fragments=78 invariants=9 miss=0`，`exit=0` | ✅ |
-| 引用可解析性回归 | `python3 /tmp/va.py`（附录 A） | `01-ponytail.md: distinct_refs=131 bad=0`（refs 数与 task-8 相同 → δ.5 未新增引用） | ✅ |
+| 自审脚本复跑 | 提取 §7.1 的 **js 代码块** 为 `$TMPDIR/s0b.mjs`，`node $TMPDIR/s0b.mjs findings/01-ponytail.md` | `items=63 citations=111 quoted=63 fragments=78 invariants=9 miss=0`，`exit=0` | ✅ |
+| 引用可解析性回归 | `python3 $TMPDIR/va.py`（附录 A） | `01-ponytail.md: distinct_refs=131 bad=0`（refs 数与 task-8 相同 → δ.5 未新增引用） | ✅ |
 | 引文包含性回归 | 同上 | `doc01 item-quotes: items=63 citations=111 fragments=78 miss=0` | ✅ |
 | task-8 的 5 处修复未被扰动 | `sed -n '71p;243p;259p;281p;441p' findings/01-ponytail.md` | 5 行内容与 §4.2 记录一致（P-09 双锚点、canonical 单位、P: 前缀、S4 表行） | ✅ |
 | 结构完整性 | CommonMark 代码跨度模拟 + 围栏/表格检查 | 围栏 2 行配平；表格 0 处错位；0 个未闭合代码跨度 | ✅ |
@@ -385,14 +385,14 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l  # 0 
 #### 4.8.4 写纪律
 
 ```
-$ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=all
+$ git status --short --untracked-files=all
 ?? findings/01-ponytail.md
 ?? findings/02-andrej-karpathy-skills.md
 ?? findings/03-deepseek-harness.md
 ?? findings/99-verification.md
 $ git -C .refs/ponytail status --porcelain | wc -l               # 0  HEAD=e3ba2aa6…56156
 $ git -C .refs/andrej-karpathy-skills status --porcelain | wc -l # 0  HEAD=2c606141…b9c2
-$ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l  # 0  HEAD=477b4f42…c443
+$ git -C $DSH status --short | wc -l  # 0  HEAD=477b4f42…c443
 ```
 
 恰为 `findings/` 下 4 个文件；三快照 HEAD 未变、porcelain 0 行。**写纪律 PASS。**
@@ -489,17 +489,17 @@ $ git -C /home/leihaohao/workspace/deepseek-harness status --short | wc -l  # 0 
 
 ## 附录 A 全量审计脚本（本报告 §1.0 的全部数字由它产出）
 
-用法：把下面代码块存为 `/tmp/va.py`，在仓库根执行 `python3 /tmp/va.py`。
+用法：把下面代码块存为 `$TMPDIR/va.py`，在仓库根执行 `python3 $TMPDIR/va.py`。
 
 ```python
 #!/usr/bin/env python3
 # Independent citation audit for findings/01,02,03 (verifier: citation-verifier).
-# Reproduce: save as /tmp/va.py, run `python3 /tmp/va.py` from the repo root.
-import re
+# Reproduce: save as $TMPDIR/va.py, run `python3 $TMPDIR/va.py` from the repo root.
+import re, os
 from pathlib import Path
-REPO = Path('/home/leihaohao/workspace/agent-rules')
+REPO = Path('.')
 ROOTS = {'P': REPO/'.refs/ponytail', 'K': REPO/'.refs/andrej-karpathy-skills',
-         'H': Path('/home/leihaohao/workspace/deepseek-harness')}
+         'H': Path(os.environ['DSH'])}
 DOC = {'P': REPO/'findings/01-ponytail.md', 'K': REPO/'findings/02-andrej-karpathy-skills.md',
        'H': REPO/'findings/03-deepseek-harness.md'}
 REF = re.compile(r'([PKH]):([^\s`；、|)"\']+?):(\d+)(?:-(\d+))?')
@@ -636,7 +636,7 @@ doc03 inline quotes: fragments=337 not_contained_in_line_refs=12
 ### B.1 规模（`01`）
 
 ```
-$ cd /home/leihaohao/workspace/agent-rules/.refs/ponytail
+$ cd .refs/ponytail
 $ git ls-files | wc -l                                            # 166
 $ wc -l README.md AGENTS.md .agents/rules/ponytail.md             # 395 32 30
 $ for f in skills/*/SKILL.md; do wc -l < "$f"; done               # 41 44 50 71 57 120
@@ -681,7 +681,7 @@ $ grep -rnF '<!-- ponytail:' --exclude-dir=.git .    # 4 行
 ### B.4 `02` 的两条 FAIL 证据
 
 ```
-$ cd /home/leihaohao/workspace/agent-rules/.refs/andrej-karpathy-skills
+$ cd .refs/andrej-karpathy-skills
 $ grep -c '^```' README.md README.zh.md
 README.md:12
 README.zh.md:12
@@ -698,14 +698,14 @@ $ grep -rn -i api . --exclude-dir=.git
 ### B.5 `03` 的两条 FAIL 与 A 层 token 分布
 
 ```
-$ cd /home/leihaohao/workspace/deepseek-harness
+$ cd $DSH
 $ git ls-files 'scripts/verify-*.ts' | wc -l                                   # 68
 $ git ls-files 'scripts/verify-*.ts' | grep -c '\.spec\.ts$'                   # 27
 $ grep -nE '^  [a-z0-9-]+:$' .github/workflows/ci.yml | grep -v pull_request | wc -l   # 11
 $ git status --short --ignored=matching --untracked-files=normal | wc -l       # 653
 $ python3 - <<'PY'
 import re, collections
-doc=open('/home/leihaohao/workspace/agent-rules/findings/03-deepseek-harness.md',encoding='utf-8').read().split('\n')
+doc=open('findings/03-deepseek-harness.md',encoding='utf-8').read().split('\n')
 items=[l for l in doc if re.match(r'^- \*\*A\d',l)]
 ids=[re.match(r'^- \*\*(A[\d.]+)\*\*',l).group(1) for l in items]
 print(len(items), len(set(ids)), collections.Counter(re.findall(r'· ([a-zA-Z·+-]+) —','\n'.join(items))))
@@ -734,3 +734,8 @@ findings/01-ponytail.md 63 ['P-05', 'P-08', 'P-16', 'P-21', 'P-32', 'P-58', 'P-6
 findings/02-andrej-karpathy-skills.md 32 ['R3', 'R4', 'R11', 'R13', 'R16', 'R28', 'R31', 'R32']
 findings/03-deepseek-harness.md 161 ['A1.19', 'A1.20', 'A1.31', 'A2.07', 'A2.26', 'A2.49', 'A2.70', 'A2.72']
 ```
+
+## §5 去标识轮（机器痕迹移除）
+
+> 本轮（Lead 执行，用户裁决 C）把本批文档里的机器痕迹换成公开链接或相对写法：`$DSH` 指公开仓库 <https://github.com/deepseek-ai/deepseek-harness> 的本地只读克隆（定义见 `:4`）、`$TMPDIR` 指系统临时目录，仓库内路径一律改为相对本仓库根目录，`findings/01` 的上游仓库行改记公开链接。**原有行号未变**（替换全部在行内完成，本节追加在文件末尾），因此全部 `文件名:行号` 引用不受影响；§1–§4 的冻结值（含 `:13-15`、`:261-263`、`:357-360`、`:422-425`、`:476-478`）保留为历史留痕，记录的是各自轮次当时、去标识前的文件状态。`rules/` 未改动。
+> 去标识轮本身的新冻结值与逐项核验见 `review/12-deident-verification.md`。

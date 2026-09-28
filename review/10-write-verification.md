@@ -126,7 +126,7 @@
 ### 3.7 写纪律
 
 ```
-$ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=all
+$ git status --short --untracked-files=all
 ?? findings/{01-ponytail,02-andrej-karpathy-skills,03-deepseek-harness,99-verification}.md   （4）
 ?? review/{00-schema,01-ponytail,02-andrej-karpathy-skills,03-deepseek-harness,04-adjudications,
           05-merge-plan,06-rewrite-pack,07-rewrite-audit,08-user-rules,09-write-manifest}.md  （10）
@@ -153,12 +153,12 @@ $ git -C /home/leihaohao/workspace/agent-rules status --short --untracked-files=
 4. **分节顺序允许主观**：只报"未发现明显错位"，未逐条评估顺序最优性。
 5. **未验证运行时效果**：规则集是给 agent 读的文本，其行为效果不在本轮范围（无对照实验）。
 
-## §6 复跑脚本与命令
+## §6 复跑脚本与命令（全部在仓库根执行）
 
 ### A/B. 期望池构建 + 严格逐字 + 归属文件双向匹配
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re
 from collections import Counter
 from pathlib import Path
@@ -231,7 +231,7 @@ multiset equality: True
 ### C. 替换覆盖：台账/06 旧句不得出现
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re
 from pathlib import Path
 def strict(s): return re.sub(r'^-\s*', '', s.strip()).strip()
@@ -260,7 +260,7 @@ PY
 ### D. 质检命令块（专名 / 负面起句 / 泄漏 / 格式）
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules
+# 在仓库根执行
 for f in base gates frontend; do
   echo "== $f =="
   printf 'items=%s ' "$(grep -c '^- ' rules/$f.md)"
@@ -276,7 +276,7 @@ done
 ### E. 相似度扫描（0.55，含 A2.60↔A2.72 复现）
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re, difflib, itertools
 from pathlib import Path
 def items(f): return [re.sub(r'^-\s*','',l.strip()) for l in Path(f'rules/{f}.md').read_text(encoding='utf-8').split('\n') if l.startswith('- ')]
@@ -403,7 +403,7 @@ $ git status --short --untracked-files=all | awk '{print $2}' | sed 's|/[^/]*$||
 ### 7.8 复跑脚本（改动面证据）
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re, hashlib
 from pathlib import Path
 def strict(s): return re.sub(r'^-\s*', '', s.strip()).strip()
@@ -557,7 +557,7 @@ sections in frontend.md: 4
 ### 8.6 复跑命令
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re, hashlib
 from pathlib import Path
 def strict(s): return re.sub(r'^-\s*', '', s.strip()).strip()
@@ -706,7 +706,7 @@ frontend: stmt_lines=19 mapped=19 same-set=True                           ← �
 ### 9.7 复跑命令
 
 ```bash
-cd /home/leihaohao/workspace/agent-rules && python3 - <<'PY'
+python3 - <<'PY'
 import re, hashlib
 from pathlib import Path
 def strict(s): return re.sub(r'^-\s*', '', s.strip()).strip()
@@ -770,3 +770,8 @@ PY
 2. **静态核验的边界**：不覆盖行为效果（R-5）；`0.55` 阈值依赖既定度量（R-6）。
 3. **冻结值失效条件**：任何 `rules/` 改动都会使 §9.8 裁定失效；`review/` 内记录文件的改动不影响 `rules/` 裁定，但会影响溯源链（`review/11`）的可点击性。
 4. **未核范围同 §5**：清单外语境、台账标签本身的对错、写入后的长期维护。
+
+## §10 去标识轮（机器痕迹移除）
+
+> 本轮（Lead 执行，用户裁决 C）把本报告内的绝对路径与临时路径替换为相对写法，复跑命令统一在仓库根执行；**原有行号未变**（替换全部在行内完成，本节追加在文件末尾），因此引用不受影响。**`rules/` 一字未改**（`d4cc9a89…` / `8f9104db…` / `e2d3cddf…` 不变），§9 对 `rules/` 的裁定继续有效。
+> 去标识轮的新冻结值与逐项核验见 `review/12-deident-verification.md`。
